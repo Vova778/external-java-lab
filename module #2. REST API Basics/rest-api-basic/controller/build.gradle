@@ -1,0 +1,16 @@
+dependencies {
+    implementation project(':service')
+    implementation project(':core')
+}
+task controller(type : Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes 'Implementation-Name': project.name,
+                'Implementation-Version': version
+    }
+
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
+}
+
