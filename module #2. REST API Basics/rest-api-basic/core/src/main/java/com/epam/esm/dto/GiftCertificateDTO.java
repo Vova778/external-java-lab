@@ -6,6 +6,7 @@ import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBl
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -35,5 +36,7 @@ public class GiftCertificateDTO {
     @JsonProperty("lastUpdateDate")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime lastUpdateDate;
+
+    private Set<TagDTO> tags;
 
 }

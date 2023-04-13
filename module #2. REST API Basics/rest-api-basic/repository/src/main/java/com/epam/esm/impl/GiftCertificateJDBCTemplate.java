@@ -1,5 +1,6 @@
-package com.epam.esm.repository.mysql;
+package com.epam.esm.impl;
 
+import com.epam.esm.GiftCertificateRepository;
 import com.epam.esm.model.GiftCertificate;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -16,7 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Repository
-public class GiftCertificateJDBCTemplate  {
+public class GiftCertificateJDBCTemplate implements GiftCertificateRepository {
     private static final String INSERT = " INSERT INTO external_lab_module_2.gift_certificate " +
             "(name, description, price, duration, create_date) VALUES (?, ?, ?, ?, ?)";
     private static final String FIND_BY_ID = "SELECT * FROM external_lab_module_2.gift_certificate WHERE id = ?";
@@ -64,6 +65,11 @@ public class GiftCertificateJDBCTemplate  {
         return giftCertificate;
     }
 
+    @Override
+    public Optional<List<GiftCertificate>> findAllByName(String name) {
+        return Optional.empty();
+    }
+
     public Optional<GiftCertificate> findByName(String name) {
         Optional<GiftCertificate> giftCertificate;
         try {
@@ -87,5 +93,10 @@ public class GiftCertificateJDBCTemplate  {
 
     public void deleteById(Long id) {
         jdbcTemplate.update(DELETE, id);
+    }
+
+    @Override
+    public void attachTagToCertificate(Long tagId, Long certificateId) {
+
     }
 }
