@@ -17,6 +17,6 @@ public interface GiftCertificateRepository {
     Optional<List<GiftCertificate>> findAll();
 
     void deleteById(Long id);
-    public void attachTagToCertificate(Long tagId, Long certificateId);
-    void update(Long id, GiftCertificate giftCertificate);
+    void attachTagToCertificate(Long tagId, Long certificateId);
+    void update(GiftCertificate giftCertificate);
 }

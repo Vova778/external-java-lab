@@ -6,8 +6,18 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.init.DatabasePopulator;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.support.TransactionTemplate;
 
+import javax.sql.DataSource;
 import java.util.Objects;
 
 @Slf4j
@@ -15,8 +25,8 @@ import java.util.Objects;
 @Profile("prod")
 @ComponentScan("com.epam.esm")
 @PropertySource("classpath:application-prod.properties")
+@EnableTransactionManagement
 public class ProdDataSourceConfiguration implements DataSourceConfiguration {
-
     private static final String DRIVER = "spring.datasource.mysql.driver";
     private static final String URL = "spring.datasource.mysql.url";
     private static final String USER = "spring.datasource.mysql.user";
@@ -47,6 +57,11 @@ public class ProdDataSourceConfiguration implements DataSourceConfiguration {
         dataSource = new HikariDataSource(config);
         log.debug("HikariDataSource for PROD Profile created");
 
+        Resource initSchema = new ClassPathResource("mysql/db-script.sql");
+        DatabasePopulator databasePopulator = new ResourceDatabasePopulator(initSchema);
+        DatabasePopulatorUtils.execute(databasePopulator, dataSource);
+        log.debug("SQL script for MySQL database executed");
+
         return dataSource;
     }
 
@@ -55,4 +70,18 @@ public class ProdDataSourceConfiguration implements DataSourceConfiguration {
     public JdbcTemplate getJDBCTemplate() {
         return new JdbcTemplate(getDataSource());
     }
+
+    @Bean
+    @Primary
+    public PlatformTransactionManager transactionManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
+    }
+
+    @Bean
+    @Primary
+    public TransactionTemplate transactionTemplate(PlatformTransactionManager transactionManager) {
+        return new TransactionTemplate(transactionManager);
+    }
+
+
 }

@@ -85,10 +85,10 @@ public class GiftCertificateJDBCTemplate implements GiftCertificateRepository {
         return Optional.of(jdbcTemplate.query(FIND_ALL, new BeanPropertyRowMapper<>(GiftCertificate.class)));
     }
 
-    public void update(Long id, GiftCertificate giftCertificate) {
+    public void update( GiftCertificate giftCertificate) {
         jdbcTemplate.update(UPDATE, giftCertificate.getName(), giftCertificate.getDescription(),
                 giftCertificate.getPrice(), giftCertificate.getDuration(), giftCertificate.getLastUpdateDate(),
-                id);
+                giftCertificate.getId());
     }
 
     public void deleteById(Long id) {

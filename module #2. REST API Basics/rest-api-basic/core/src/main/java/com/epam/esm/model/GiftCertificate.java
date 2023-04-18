@@ -31,6 +31,7 @@ public class GiftCertificate {
     private LocalDateTime createDate;
     private LocalDateTime lastUpdateDate;
 
+    @EqualsAndHashCode.Exclude
     @Builder.Default
     private Set<Tag> tags = new HashSet<>();
 }

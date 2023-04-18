@@ -124,11 +124,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Transactional
     @Override
-    public void update(Long id, GiftCertificateDTO giftCertificateDTO) {
+    public void update(GiftCertificateDTO giftCertificateDTO) {
         Validate.notNull(giftCertificateDTO, "GiftCertificateDTO can't be Null");
-        if (id == null || id < 1) {
+        if (giftCertificateDTO.getId() == null || giftCertificateDTO.getId() < 1) {
             log.error("[GiftCertificateService.update()] An exception occurs: given ID:[{}]" +
-                    " can't be less than zero or null", id);
+                    " can't be less than zero or null", giftCertificateDTO.getId());
             throw new IllegalArgumentException("Given ID can't be less than zero or null");
         }
 
@@ -138,9 +138,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
                 try {
-                    giftCertificateRepository.update(id, giftCertificate);
-                    attachAndSaveTags(giftCertificate, id);
-                    log.debug("[GiftCertificateService.update()] GiftCertificate with ID:[{}] updated.", id);
+                    giftCertificateRepository.update( giftCertificate);
+                    attachAndSaveTags(giftCertificate, giftCertificateDTO.getId());
+                    log.debug("[GiftCertificateService.update()] GiftCertificate with ID:[{}] updated.", giftCertificateDTO.getId());
                 } catch (Exception e) {
                     transactionStatus.setRollbackOnly();
                     log.error("[GiftCertificateService.update()] rollback !!!");

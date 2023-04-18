@@ -12,7 +12,7 @@ public interface GiftCertificateService {
     List<GiftCertificateDTO> findAll();
     List<GiftCertificateDTO> findAllByName(String name);
 
-    void update(Long id, GiftCertificateDTO giftCertificateDTO);
+    void update(GiftCertificateDTO giftCertificateDTO);
 
     void deleteById(Long id);
 }

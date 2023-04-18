@@ -1,6 +1,8 @@
 dependencies {
     implementation project(':service')
     implementation project(':core')
+    implementation project(':repository')
+
 }
 task controller(type : Jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
