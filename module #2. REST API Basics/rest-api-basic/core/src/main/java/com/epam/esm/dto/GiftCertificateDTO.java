@@ -1,12 +1,15 @@
 package com.epam.esm.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
-import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+
 
 @Data
 @NoArgsConstructor
@@ -15,18 +18,12 @@ import java.util.Set;
 public class GiftCertificateDTO {
     private Long id;
 
-    @NotBlank
-    @NonNull
     private String name;
 
-    @NotBlank
-    @NonNull
     private String description;
 
-    @NonNull
     private Double price;
 
-    @NonNull
     private Integer duration;
 
     @JsonProperty("createDate")
@@ -38,5 +35,4 @@ public class GiftCertificateDTO {
     private LocalDateTime lastUpdateDate;
 
     private Set<TagDTO> tags;
-
 }

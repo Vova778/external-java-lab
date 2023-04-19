@@ -9,7 +9,7 @@ public interface TagService {
 
     TagDTO findById(Long id);
 
-    List<TagDTO> findByName(String name);
+    List<TagDTO> findAllByName(String name);
 
     List<TagDTO> findAll();
 

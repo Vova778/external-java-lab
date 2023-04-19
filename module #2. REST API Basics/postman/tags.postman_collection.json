@@ -1,0 +1,131 @@
+{
+  "info": {
+    "_postman_id": "ccc39e63-1c10-4f50-8959-1fe5427520d6",
+    "name": "tags",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "post",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": " {\r\n        \"name\": \"pascal\"\r\n    }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/rest_api_basic_1_0_war/tags/new",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "rest_api_basic_1_0_war",
+            "tags",
+            "create"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get-all",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/rest_api_basic_1_0_war/tags/find-all",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "rest_api_basic_1_0_war",
+            "tags",
+            "find-all"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get-by-id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/rest_api_basic_1_0_war/tags/find/3",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "rest_api_basic_1_0_war",
+            "tags",
+            "find",
+            "3"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get-by-name",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/rest_api_basic_1_0_war/tags/find?name=c",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "rest_api_basic_1_0_war",
+            "tags",
+            "find"
+          ],
+          "query": [
+            {
+              "key": "name",
+              "value": "a"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "delete",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/rest_api_basic_1_0_war/tags/delete/9",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "rest_api_basic_1_0_war",
+            "tags",
+            "delete",
+            "9"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

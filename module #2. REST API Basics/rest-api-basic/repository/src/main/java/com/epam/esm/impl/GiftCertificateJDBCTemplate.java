@@ -2,6 +2,9 @@ package com.epam.esm.impl;
 
 import com.epam.esm.GiftCertificateRepository;
 import com.epam.esm.model.GiftCertificate;
+import com.epam.esm.utils.QueryParameters;
+import com.epam.esm.utils.QueryProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,32 +20,35 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 public class GiftCertificateJDBCTemplate implements GiftCertificateRepository {
-    private static final String INSERT = " INSERT INTO external_lab_module_2.gift_certificate " +
-            "(name, description, price, duration, create_date) VALUES (?, ?, ?, ?, ?)";
-    private static final String FIND_BY_ID = "SELECT * FROM external_lab_module_2.gift_certificate WHERE id = ?";
-    private static final String FIND_BY_NAME = "SELECT * FROM external_lab_module_2.gift_certificate WHERE name = ?";
-    private static final String FIND_ALL = "SELECT * FROM external_lab_module_2.gift_certificate";
-    private static final String UPDATE = "UPDATE external_lab_module_2.gift_certificate SET name = ?, description = ?,"
-            + "price = ?, duration = ?, last_update_date = ? WHERE id = ?";
-    private static final String DELETE = "DELETE FROM external_lab_module_2.gift_certificate WHERE id = ?";
 
     private final JdbcTemplate jdbcTemplate;
+    private final QueryProvider queryProvider;
 
-    public GiftCertificateJDBCTemplate(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public void attachTagToCertificate(Long tagId, Long certificateId) {
+        if (tagId != null && certificateId != null) {
+            jdbcTemplate.update(queryProvider.attachCertificateToTag(), tagId, certificateId);
+        }
     }
 
-
+    @Override
     public boolean isExists(GiftCertificate giftCertificate) {
-        return false;
+        Optional<GiftCertificate> certificate;
+        try {
+            certificate = Optional.ofNullable(jdbcTemplate.queryForObject(queryProvider.isExists(),
+                    new BeanPropertyRowMapper<>(GiftCertificate.class), giftCertificate.getName()));
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
+        return certificate.isPresent();
     }
 
-
+    @Override
     public Long save(GiftCertificate giftCertificate) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(INSERT, new String[]{"id"});
+            PreparedStatement ps = connection.prepareStatement(queryProvider.insert(), new String[]{"id"});
             ps.setString(1, giftCertificate.getName());
             ps.setString(2, giftCertificate.getDescription());
             ps.setBigDecimal(3, BigDecimal.valueOf(giftCertificate.getPrice()));
@@ -54,49 +60,54 @@ public class GiftCertificateJDBCTemplate implements GiftCertificateRepository {
         return Objects.requireNonNull(keyHolder.getKey()).longValue();
     }
 
+    @Override
     public Optional<GiftCertificate> findById(Long id) {
-        Optional<GiftCertificate> giftCertificate;
+        Optional<GiftCertificate> certificate;
         try {
-            giftCertificate = Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_ID,
+            certificate = Optional.ofNullable(jdbcTemplate.queryForObject(queryProvider.findById(),
                     new BeanPropertyRowMapper<>(GiftCertificate.class), id));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
-        return giftCertificate;
+        return certificate;
+    }
+
+    public Optional<List<GiftCertificate>> findAllByName(String name) {
+        return getGiftCertificates(name, queryProvider.findAllByName());
     }
 
     @Override
-    public Optional<List<GiftCertificate>> findAllByName(String name) {
-        return Optional.empty();
+    public Optional<List<GiftCertificate>> findAll() {
+        return Optional.of(jdbcTemplate.query(queryProvider.findAll(),
+                new BeanPropertyRowMapper<>(GiftCertificate.class)));
     }
 
-    public Optional<GiftCertificate> findByName(String name) {
-        Optional<GiftCertificate> giftCertificate;
+    @Override
+    public Optional<List<GiftCertificate>> findAllWithParams(QueryParameters queryParameters) {
+        queryProvider.setQueryParameters(queryParameters);
+        return Optional.of(jdbcTemplate.query(queryProvider.findAllWithParams()
+                , new BeanPropertyRowMapper<>(GiftCertificate.class)));
+    }
+
+    @Override
+    public void update(GiftCertificate giftCertificate) {
+        jdbcTemplate.update(queryProvider.update(giftCertificate));
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        jdbcTemplate.update(queryProvider.delete(), id);
+    }
+
+    private Optional<List<GiftCertificate>> getGiftCertificates(String option, String query) {
+        Optional<List<GiftCertificate>> certificates;
         try {
-            giftCertificate = Optional.ofNullable(jdbcTemplate.queryForObject(FIND_BY_NAME,
-                    new BeanPropertyRowMapper<>(GiftCertificate.class), name));
+            certificates = Optional.of(jdbcTemplate.query(query,
+                    new BeanPropertyRowMapper<>(GiftCertificate.class), "%" + option + "%"));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
-        return giftCertificate;
-    }
-
-    public Optional<List<GiftCertificate>> findAll() {
-        return Optional.of(jdbcTemplate.query(FIND_ALL, new BeanPropertyRowMapper<>(GiftCertificate.class)));
-    }
-
-    public void update( GiftCertificate giftCertificate) {
-        jdbcTemplate.update(UPDATE, giftCertificate.getName(), giftCertificate.getDescription(),
-                giftCertificate.getPrice(), giftCertificate.getDuration(), giftCertificate.getLastUpdateDate(),
-                giftCertificate.getId());
-    }
-
-    public void deleteById(Long id) {
-        jdbcTemplate.update(DELETE, id);
-    }
-
-    @Override
-    public void attachTagToCertificate(Long tagId, Long certificateId) {
-
+        return certificates;
     }
 }
+

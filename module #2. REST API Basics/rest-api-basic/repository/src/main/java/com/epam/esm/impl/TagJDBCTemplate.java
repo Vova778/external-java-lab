@@ -17,13 +17,13 @@ import java.util.Optional;
 
 @Repository
 public class TagJDBCTemplate implements TagRepository {
-    private static final String INSERT = "INSERT INTO external_lab_module_2.tag (name) VALUES (?)";
-    private static final String FIND_BY_ID = "SELECT * FROM external_lab_module_2.tag WHERE id = ?";
-    private static final String FIND_BY_NAME = "SELECT * FROM external_lab_module_2.tag WHERE name = ?";
-    private static final String FIND_ALL = "SELECT * FROM external_lab_module_2.tag";
-    private static final String DELETE = "DELETE FROM external_lab_module_2.tag WHERE id = ?";
-    private static final String FIND_ALL_BY_NAME = "SELECT * FROM external_lab_module_2.tag WHERE name LIKE ?";
-    private static final String FIND_ALL_BY_CERTIFICATE = "SELECT external_lab_module_2.tag.id, external_lab_module_2.tag.name FROM external_lab_module_2.tag LEFT JOIN" +
+    private static final String INSERT = "INSERT INTO external_lab.tag (name) VALUES (?)";
+    private static final String FIND_BY_ID = "SELECT * FROM external_lab.tag WHERE id = ?";
+    private static final String FIND_BY_NAME = "SELECT * FROM external_lab.tag WHERE name = ?";
+    private static final String FIND_ALL = "SELECT * FROM external_lab.tag";
+    private static final String DELETE = "DELETE FROM external_lab.tag WHERE id = ?";
+    private static final String FIND_ALL_BY_NAME = "SELECT * FROM external_lab.tag WHERE name LIKE ?";
+    private static final String FIND_ALL_BY_CERTIFICATE = "SELECT external_lab.tag.id, external_lab.tag.name FROM external_lab.tag LEFT JOIN" +
             " tag_has_gift_certificate on tag.id = tag_has_gift_certificate.tag_id WHERE gift_certificate_id = ?";
 
     private final JdbcTemplate jdbcTemplate;
