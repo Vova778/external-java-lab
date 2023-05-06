@@ -1,0 +1,274 @@
+{
+  "info": {
+    "_postman_id": "40ce61b2-9c0a-43f1-84c3-fc4e9887aac6",
+    "name": "certificates",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "post",
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n        \"name\": \"test\",\r\n        \"description\": \"specific\",\r\n        \"price\": 55.0,\r\n        \"duration\": 2,\r\n        \"tags\": [{\r\n                \"name\": \"scala\"\r\n            },\r\n            {\r\n                \"name\": \"java\"\r\n            },\r\n            {   \r\n                \"name\": \"python\"\r\n            }]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/rest_api_basic_1_0_war/certificates/new",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "rest_api_basic_1_0_war",
+            "certificates",
+            "new"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "post-rollback",
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n        \"name\": \"test\",\r\n        \"description\": \"specific\",\r\n        \"price\": 55.0,\r\n        \"duration\": 2,\r\n        \"tags\": [{\r\n                \"name\": null\r\n            },\r\n            {\r\n                \"name\": \"java\"\r\n            },\r\n            {   \r\n                \"name\": \"python\"\r\n            }]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/rest_api_basic_1_0_war/certificates/new",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "rest_api_basic_1_0_war",
+            "certificates",
+            "create"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get-all",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "http://localhost:8080/rest_api_basic_1_0_war/certificates/find-all",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "rest_api_basic_1_0_war",
+            "certificates",
+            "find-all"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get-by-name",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/rest_api_basic_1_0_war/certificates/find?name=mi",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "rest_api_basic_1_0_war",
+            "certificates",
+            "find"
+          ],
+          "query": [
+            {
+              "key": "name",
+              "value": "m"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get-by-id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/rest_api_basic_1_0_war/certificates/find/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "rest_api_basic_1_0_war",
+            "certificates",
+            "find",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "git-all-with-params",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/rest_api_basic_1_0_war/certificates/find-all-with-params?tagName=c&name=m&description=n&sortByName=DESC&sortByDate=",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "rest_api_basic_1_0_war",
+            "certificates",
+            "find-all-with-params"
+          ],
+          "query": [
+            {
+              "key": "tagName",
+              "value": "m"
+            },
+            {
+              "key": "description",
+              "value": "n"
+            },
+            {
+              "key": "sortByName",
+              "value": "DESC"
+            },
+            {
+              "key": "sortByDate",
+              "value": ""
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "put",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n        \"name\": \"neJava\",\r\n        \"description\": \"best choice\",\r\n        \"price\": 1488.0,\r\n        \"duration\": 5,\r\n        \"tags\": [\r\n            {\r\n                \"name\": \"groovy\"\r\n            }\r\n        ]\r\n    }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/rest_api_basic_1_0_war/certificates/update/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "rest_api_basic_1_0_war",
+            "certificates",
+            "update"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "put-rollback",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n        \"name\": \"NoJava\",\r\n        \"description\": \"best choice\",\r\n        \"price\": 1488.0,\r\n        \"duration\": 5,\r\n        \"tags\": [\r\n            {\r\n                \"name\": \"groovy\"\r\n            }\r\n        ]\r\n    }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/rest_api_basic_1_0_war/certificates/update/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "rest_api_basic_1_0_war",
+            "certificates",
+            "update",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "delete",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/rest_api_basic_1_0_war/certificates/delete/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "rest_api_basic_1_0_war",
+            "certificates",
+            "delete",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+dependencies {
+    implementation project(':core')
+    // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: '5.0.1'
+
+}
+
+task repository(type : Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes 'Implementation-Name': project.name,
+                'Implementation-Version': version
+    }
+
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
+}
