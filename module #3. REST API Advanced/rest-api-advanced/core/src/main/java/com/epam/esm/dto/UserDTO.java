@@ -12,6 +12,5 @@ public class UserDTO {
     private String email;
     private String firstName;
     private String lastName;
-    /*@EqualsAndHashCode.Exclude
-    private Set<Receipt> receipts;*/
+
 }

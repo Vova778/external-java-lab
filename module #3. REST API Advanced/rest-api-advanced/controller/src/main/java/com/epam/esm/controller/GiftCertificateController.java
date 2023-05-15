@@ -2,23 +2,27 @@ package com.epam.esm.controller;
 
 import com.epam.esm.dto.GiftCertificateDTO;
 import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.utils.Pageable;
 import com.epam.esm.utils.QueryParameters;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/certificates")
 @RequiredArgsConstructor
+@Slf4j
 public class GiftCertificateController {
     private final GiftCertificateService giftCertificateService;
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    void save(@RequestBody GiftCertificateDTO giftCertificateDTO) {
-        giftCertificateService.save(giftCertificateDTO);
+    GiftCertificateDTO save(@RequestBody GiftCertificateDTO giftCertificateDTO) {
+        return giftCertificateService.save(giftCertificateDTO);
     }
 
     @GetMapping("/find/{id}")
@@ -27,13 +31,24 @@ public class GiftCertificateController {
     }
 
     @GetMapping("/find")
-    List<GiftCertificateDTO> findByName(@RequestParam String name) {
-        return giftCertificateService.findAllByName(name);
+    List<GiftCertificateDTO> findByName(@RequestParam String name,
+                                        @RequestParam Integer page,
+                                        @RequestParam Integer pageSize) {
+        return giftCertificateService.findAllByName(name, new Pageable(page, pageSize));
     }
 
     @GetMapping("/find-all")
-    List<GiftCertificateDTO> findAll() {
-        return giftCertificateService.findAll();
+    List<GiftCertificateDTO> findAll(@RequestParam Integer page,
+                                     @RequestParam Integer pageSize) {
+        return giftCertificateService.findAll(new Pageable(page, pageSize));
+    }
+
+    @PostMapping("/find-by-tags")
+    List<GiftCertificateDTO> findByTags(@RequestBody Set<String> tags,
+                                        @RequestParam Integer page,
+                                        @RequestParam Integer pageSize) {
+        log.debug("FIND_BY_TAGS [{}]", tags);
+        return giftCertificateService.findAllByTags(tags, new Pageable(page, pageSize));
     }
 
     @GetMapping("/find-all-with-params")
@@ -41,7 +56,9 @@ public class GiftCertificateController {
                                                @RequestParam(required = false) String name,
                                                @RequestParam(required = false) String description,
                                                @RequestParam(required = false) String sortByName,
-                                               @RequestParam(required = false) String sortByDate) {
+                                               @RequestParam(required = false) String sortByDate,
+                                               @RequestParam Integer page,
+                                               @RequestParam Integer pageSize) {
 
         QueryParameters queryParams = QueryParameters.builder()
                 .tagName(tagName)
@@ -50,18 +67,18 @@ public class GiftCertificateController {
                 .sortByName(sortByName)
                 .sortByDate(sortByDate)
                 .build();
-        return giftCertificateService.findAllWithParams(queryParams);
+        return giftCertificateService.findAllWithParams(queryParams, new Pageable(page, pageSize));
     }
 
 
-    @PutMapping("/update")
-    void update(@RequestBody GiftCertificateDTO giftCertificateDTO) {
-        giftCertificateService.update(giftCertificateDTO);
+    @PatchMapping("/update")
+    GiftCertificateDTO update(@RequestBody GiftCertificateDTO giftCertificateDTO) {
+        return giftCertificateService.update(giftCertificateDTO);
     }
 
     @DeleteMapping("/delete/{id}")
-    void deleteById(@PathVariable Long id) {
-        giftCertificateService.deleteById(id);
+    GiftCertificateDTO deleteById(@PathVariable Long id) {
+        return giftCertificateService.deleteById(id);
     }
 
 }

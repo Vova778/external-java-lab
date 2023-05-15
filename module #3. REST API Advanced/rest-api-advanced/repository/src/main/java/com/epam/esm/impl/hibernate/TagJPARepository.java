@@ -2,6 +2,7 @@ package com.epam.esm.impl.hibernate;
 
 import com.epam.esm.TagRepository;
 import com.epam.esm.model.Tag;
+import com.epam.esm.utils.Pageable;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
@@ -63,7 +64,14 @@ public class TagJPARepository implements TagRepository {
         return result;
     }
 
-
+    @Override
+    public List<Tag> findAll(Pageable pageable) {
+        int firstResult = (pageable.getPage() - 1) * pageable.getPageSize();
+        return entityManager.createQuery(FIND_ALL, Tag.class)
+                .setFirstResult(firstResult)
+                .setMaxResults(pageable.getPageSize())
+                .getResultList();
+    }
 
     @Override
     public List<Tag> findAllByCertificate(Long certificateId) {
@@ -81,5 +89,9 @@ public class TagJPARepository implements TagRepository {
         return tag;
     }
 
-
+    @Override
+    public Long getTotalRecords() {
+        TypedQuery<Long> countQuery = entityManager.createQuery(GET_TOTAL_RECORDS, Long.class);
+        return countQuery.getSingleResult();
+    }
 }

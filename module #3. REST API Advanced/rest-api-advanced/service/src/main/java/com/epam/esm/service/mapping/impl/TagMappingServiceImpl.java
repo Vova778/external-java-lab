@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class TagMappingServiceImpl implements MappingService<Tag, TagDTO> {
-
     @Override
     public Tag mapFromDto(TagDTO dto) {
         Tag model = new Tag();

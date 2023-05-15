@@ -2,6 +2,7 @@ package com.epam.esm.controller;
 
 import com.epam.esm.dto.TagDTO;
 import com.epam.esm.service.TagService;
+import com.epam.esm.utils.Pageable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +17,8 @@ public class TagController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    void save(@RequestBody TagDTO tagDTO) {
-        tagService.save(tagDTO);
+    TagDTO save(@RequestBody TagDTO tagDTO) {
+        return tagService.save(tagDTO);
     }
 
     @GetMapping("/find/{id}")
@@ -26,17 +27,18 @@ public class TagController {
     }
 
     @GetMapping("/find")
-    List<TagDTO> findByName(@RequestParam String name) {
-        return tagService.findAllByName(name);
+    TagDTO findByName(@RequestParam String name) {
+        return tagService.findByName(name);
     }
 
     @GetMapping("/find-all")
-    List<TagDTO> findAll() {
-        return tagService.findAll();
+    List<TagDTO> findAll(@RequestParam Integer page,
+                         @RequestParam Integer pageSize) {
+        return tagService.findAll(new Pageable(page, pageSize));
     }
 
     @DeleteMapping("/delete/{id}")
-    void deleteById(@PathVariable Long id) {
-        tagService.deleteById(id);
+    TagDTO deleteById(@PathVariable Long id) {
+        return tagService.deleteById(id);
     }
 }

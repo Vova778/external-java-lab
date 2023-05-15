@@ -8,7 +8,6 @@ SET @OLD_SQL_MODE = @@SQL_MODE, SQL_MODE =
 -- -----------------------------------------------------
 -- Schema external_lab
 -- -----------------------------------------------------
-DROP SCHEMA IF EXISTS `external_lab` ;
 
 CREATE SCHEMA IF NOT EXISTS `external_lab` DEFAULT CHARACTER SET utf8mb3;
 USE `external_lab`;
@@ -27,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `external_lab`.`gift_certificate`
     `name`             VARCHAR(255) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE
-    )
+)
     ENGINE = InnoDB
     AUTO_INCREMENT = 5
     DEFAULT CHARACTER SET = utf8mb3;
@@ -42,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `external_lab`.`tag`
     `name` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE
-    )
+)
     ENGINE = InnoDB
     AUTO_INCREMENT = 31
     DEFAULT CHARACTER SET = utf8mb3;
@@ -59,16 +58,16 @@ CREATE TABLE IF NOT EXISTS `external_lab`.`gift_certificate_has_tag`
     INDEX `fk_gift_certificate_has_tag_gift_certificate_idx` (`gift_certificate_id` ASC) VISIBLE,
     INDEX `fk_gift_certificate_has_tag_tag_idx` (`tag_id` ASC) VISIBLE,
     CONSTRAINT `fk_gift_certificate_has_tag_gift_certificate`
-    FOREIGN KEY (`gift_certificate_id`)
-    REFERENCES `external_lab`.`gift_certificate` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
+        FOREIGN KEY (`gift_certificate_id`)
+            REFERENCES `external_lab`.`gift_certificate` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE,
     CONSTRAINT `fk_gift_certificate_has_tag_tag`
-    FOREIGN KEY (`tag_id`)
-    REFERENCES `external_lab`.`tag` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-    )
+        FOREIGN KEY (`tag_id`)
+            REFERENCES `external_lab`.`tag` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
+)
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb3;
 
@@ -84,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `external_lab`.`users`
     `last_name`  VARCHAR(255) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE
-    )
+)
     ENGINE = InnoDB
     AUTO_INCREMENT = 11
     DEFAULT CHARACTER SET = utf8mb3;
@@ -97,17 +96,17 @@ CREATE TABLE IF NOT EXISTS `external_lab`.`receipt`
 (
     `id`          BIGINT      NOT NULL AUTO_INCREMENT,
     `price`       DOUBLE      NOT NULL ,
-    `title`       VARCHAR(64) NOT NULL UNIQUE,
+    `title`       VARCHAR(45) NOT NULL UNIQUE,
     `create_date` DATETIME(6) NOT NULL ,
     `user_id`     BIGINT      NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `user_id_UNIQUE` (`user_id` ASC) VISIBLE,
     CONSTRAINT `receipt_user_id`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `external_lab`.`users` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-    )
+        FOREIGN KEY (`user_id`)
+            REFERENCES `external_lab`.`users` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
+)
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb3;
 
@@ -122,16 +121,16 @@ CREATE TABLE IF NOT EXISTS `external_lab`.`receipt_has_gift_certificate`
     PRIMARY KEY (`gift_certificate_id`, `receipt_id`),
     INDEX `receipt_id_UNIQUE` (`receipt_id` ASC) VISIBLE,
     CONSTRAINT `receipt_has_gift_certificate_gift_certificate_id`
-    FOREIGN KEY (`gift_certificate_id`)
-    REFERENCES `external_lab`.`gift_certificate` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
+        FOREIGN KEY (`gift_certificate_id`)
+            REFERENCES `external_lab`.`gift_certificate` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE,
     CONSTRAINT `receipt_has_gift_certificate_receipt_id`
-    FOREIGN KEY (`receipt_id`)
-    REFERENCES `external_lab`.`receipt` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-    )
+        FOREIGN KEY (`receipt_id`)
+            REFERENCES `external_lab`.`receipt` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
+)
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb3;
 

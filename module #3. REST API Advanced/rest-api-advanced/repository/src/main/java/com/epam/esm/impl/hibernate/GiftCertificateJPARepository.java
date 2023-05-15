@@ -3,6 +3,7 @@ package com.epam.esm.impl.hibernate;
 
 import com.epam.esm.GiftCertificateRepository;
 import com.epam.esm.model.GiftCertificate;
+import com.epam.esm.utils.Pageable;
 import com.epam.esm.utils.QueryParameters;
 import com.epam.esm.utils.QueryProvider;
 import jakarta.persistence.EntityManager;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Repository
@@ -56,24 +58,49 @@ public class GiftCertificateJPARepository implements GiftCertificateRepository {
     }
 
     @Override
+    public List<GiftCertificate> findAllByTags(Set<String> tags, Pageable pageable) {
+        int firstResult = (pageable.getPage() - 1) * pageable.getPageSize();
+        return entityManager.createQuery(FIND_ALL_BY_TAGS, GiftCertificate.class)
+                .setParameter("tags", tags)
+                .setFirstResult(firstResult)
+                .setMaxResults(pageable.getPageSize())
+                .getResultList();
+    }
+
+    @Override
+    public List<GiftCertificate> findAllByName(String name, Pageable pageable) {
+        int firstResult = (pageable.getPage() - 1) * pageable.getPageSize();
+        TypedQuery<GiftCertificate> query = entityManager.createQuery(
+                        FIND_ALL_BY_NAME, GiftCertificate.class)
+                .setParameter("name", "%" + name + "%")
+                .setFirstResult(firstResult)
+                .setMaxResults(pageable.getPageSize());
+        return query.getResultList();
+    }
+
+    @Override
     public Optional<GiftCertificate> findById(Long id) {
         GiftCertificate giftCertificate = entityManager.find(GiftCertificate.class, id);
         return Optional.ofNullable(giftCertificate);
     }
 
     @Override
-    public List<GiftCertificate> findAllByName(String name) {
-        return null;
+    public List<GiftCertificate> findAllWithParams(QueryParameters queryParams, Pageable pageable) {
+        int firstResult = (pageable.getPage() - 1) * pageable.getPageSize();
+        queryProvider.setQueryParams(queryParams);
+        return entityManager.createNativeQuery(queryProvider.findAllWithParams(), GiftCertificate.class)
+                .setFirstResult(firstResult)
+                .setMaxResults(pageable.getPageSize())
+                .getResultList();
     }
 
     @Override
-    public List<GiftCertificate> findAllWithParams(QueryParameters queryParameters) {
-        return null;
-    }
-
-    @Override
-    public List<GiftCertificate> findAll() {
-        return null;
+    public List<GiftCertificate> findAll(Pageable pageable) {
+        int firstResult = (pageable.getPage() - 1) * pageable.getPageSize();
+        return entityManager.createQuery(FIND_ALL, GiftCertificate.class)
+                .setFirstResult(firstResult)
+                .setMaxResults(pageable.getPageSize())
+                .getResultList();
     }
 
     @Transactional
@@ -85,13 +112,8 @@ public class GiftCertificateJPARepository implements GiftCertificateRepository {
     }
 
     @Override
-    public void attachTagToCertificate(Long tagId, Long certificateId) {
-
+    public Long getTotalRecords() {
+        TypedQuery<Long> countQuery = entityManager.createQuery(GET_TOTAL_RECORDS, Long.class);
+        return countQuery.getSingleResult();
     }
-
-    @Override
-    public void update(GiftCertificate giftCertificate) {
-
-    }
-
 }

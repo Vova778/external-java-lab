@@ -1,7 +1,8 @@
 package com.epam.esm.configuration;
+
 import jakarta.persistence.EntityManager;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -23,7 +24,6 @@ import java.util.Properties;
 @EnableTransactionManagement
 @Profile("default")
 public class JPAConfig {
-
     @Value("${spring.jpa.show-sql}")
     private String showSql;
     @Value("${spring.jpa.hibernate.ddl-auto}")
@@ -54,7 +54,7 @@ public class JPAConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         Properties properties = new Properties();
         properties.setProperty("hibernate.show_sql", showSql);
-        properties.setProperty("hibernate.hbm2ddl.auto", hibernateDDLAuto);
+        properties.setProperty("hibernate.ddl-auto", hibernateDDLAuto);
         properties.setProperty("hibernate.format_sql", formatSql);
         properties.setProperty("hibernate.highlight_sql", highlightSql);
         properties.setProperty("hibernate.dialect", dialect);

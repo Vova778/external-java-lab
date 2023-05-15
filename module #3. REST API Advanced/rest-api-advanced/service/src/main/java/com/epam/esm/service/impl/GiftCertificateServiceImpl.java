@@ -10,28 +10,24 @@ import com.epam.esm.model.GiftCertificate;
 import com.epam.esm.model.Tag;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.mapping.MappingService;
+import com.epam.esm.utils.Pageable;
 import com.epam.esm.utils.QueryParameters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * This class implements functionality of operating {@link GiftCertificateRepository}
- * and {@link TagRepository} methods in according to received
- * parameters from GiftCertificate controller
- */
+import static com.epam.esm.service.validator.PageableValidator.checkParams;
+import static com.epam.esm.service.validator.PageableValidator.validate;
+
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -41,11 +37,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final MappingService<GiftCertificate, GiftCertificateDTO> certificateMappingService;
     private final MappingService<Tag, TagDTO> tagMappingService;
 
-    private final TransactionTemplate transactionTemplate;
-
-    @Transactional
     @Override
-    public void save(GiftCertificateDTO giftCertificateDTO) {
+    public GiftCertificateDTO save(GiftCertificateDTO giftCertificateDTO) {
         GiftCertificate certificate = certificateMappingService.mapFromDto(giftCertificateDTO);
         if (giftCertificateRepository.isExists(certificate)) {
             log.error("[GiftCertificateService.save()] GiftCertificate with given name:[{}] already exists.",
@@ -54,20 +47,14 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                     "GiftCertificate with given name:[%s] already exists.", giftCertificateDTO.getName()));
         }
         certificate.setCreateDate(LocalDateTime.now());
-        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
-                try {
-                    certificate.setId(giftCertificateRepository.save(certificate));
-                    attachAndSaveTags(certificate);
-                    log.debug("[GiftCertificateService.save()] GiftCertificate with name:[{}] saved.",
-                            certificate.getName());
-                } catch (Exception e) {
-                    transactionStatus.setRollbackOnly();
-                    log.error("[GiftCertificateService.save()] rollback !!!");
-                }
-            }
+        certificate.getTags().forEach(tag -> {
+            Optional<Tag> tagOpt = tagRepository.findByName(tag.getName());
+            tagOpt.ifPresent(value -> tag.setId(value.getId()));
         });
+
+        log.debug("[GiftCertificateService.save()] GiftCertificate with name:[{}] saved.",
+                certificate.getName());
+        return certificateMappingService.mapToDto(giftCertificateRepository.save(certificate));
     }
 
     @Override
@@ -85,9 +72,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                     throw new GiftCertificateNotFoundException(String.format("GiftCertificate not found (id:[%d])", id));
                 });
 
-        List<TagDTO> tags = getMappedAndCollected(giftCertificateDTO);
-        giftCertificateDTO.setTags(new HashSet<>(tags));
-
         log.debug("[GiftCertificateService.findById()] GiftCertificate received from database: [{}], for ID:[{}]",
                 giftCertificateDTO, id);
 
@@ -95,55 +79,75 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificateDTO> findAllByName(String name) {
-        Validate.notBlank(name);
-        List<GiftCertificateDTO> certificates = giftCertificateRepository.findAllByName(name)
+    public List<GiftCertificateDTO> findAllByTags(Set<String> tags, Pageable pageable) {
+        validate(pageable);
+        if (tags == null || tags.isEmpty()) {
+            log.error("[GiftCertificateService.findByTags()] An exception occurs: tags names" +
+                    " can't be null or empty");
+            throw new IllegalArgumentException("Tag names can't be null or empty");
+        }
+        List<GiftCertificateDTO> certificates = giftCertificateRepository
+                .findAllByTags(tags, checkParams(pageable, giftCertificateRepository))
                 .stream()
-                .flatMap(Collection::stream)
                 .map(certificateMappingService::mapToDto)
-                .collect(Collectors.toList());
+                .toList();
+
+        if (certificates.isEmpty()) {
+            log.error("[GiftCertificateService.findByTags()] GiftCertificate for given tags:[{}] not found",
+                    tags);
+            throw new GiftCertificateNotFoundException(String.format("GiftCertificate not found (tags:[%s])", tags));
+        }
+
+        log.debug("[GiftCertificateService.findByTags()] GiftCertificate received from database: [{}], for tags:[{}]"
+                , certificates, tags);
+        return certificates;
+    }
+
+    @Override
+    public List<GiftCertificateDTO> findAllByName(String name, Pageable pageable) {
+        validate(pageable);
+        Validate.notBlank(name);
+        List<GiftCertificateDTO> certificates = giftCertificateRepository
+                .findAllByName(name, checkParams(pageable, giftCertificateRepository))
+                .stream()
+                .map(certificateMappingService::mapToDto)
+                .toList();
 
         if (certificates.isEmpty()) {
             log.error("[GiftCertificateService.findByName()] GiftCertificate for given name:[{}] not found",
                     name);
             throw new GiftCertificateNotFoundException(String.format("GiftCertificate not found (name:[%s])", name));
-        } else {
-            for (GiftCertificateDTO certificateDTO : certificates) {
-                List<TagDTO> tags = getMappedAndCollected(certificateDTO);
-                certificateDTO.setTags(new HashSet<>(tags));
-            }
-            log.debug("[GiftCertificateService.findByName()] GiftCertificate received from database: [{}], for name:[{}]"
-                    , certificates, name);
-            return certificates;
         }
+
+        log.debug("[GiftCertificateService.findByName()] GiftCertificate received from database: [{}], for name:[{}]"
+                , certificates, name);
+        return certificates;
     }
 
     @Override
-    public List<GiftCertificateDTO> findAll() {
-        List<GiftCertificateDTO> certificates = giftCertificateRepository.findAll()
+    public List<GiftCertificateDTO> findAll(Pageable pageable) {
+        validate(pageable);
+        return giftCertificateRepository.findAll(checkParams(pageable, giftCertificateRepository))
                 .stream()
-                .flatMap(Collection::stream)
                 .map(certificateMappingService::mapToDto)
-                .collect(Collectors.toList());
-        return getCertificateDTOSWithTags(certificates);
+                .toList();
     }
 
     @Override
-    public List<GiftCertificateDTO> findAllWithParams(QueryParameters queryParameters) {
-        if (queryParameters == null) {
+    public List<GiftCertificateDTO> findAllWithParams(QueryParameters queryParams, Pageable pageable) {
+        validate(pageable);
+        if (queryParams == null) {
             throw new IllegalArgumentException();
         }
-        List<GiftCertificateDTO> certificates = giftCertificateRepository.findAllWithParams(queryParameters)
+        return giftCertificateRepository.findAllWithParams(queryParams, checkParams(pageable, giftCertificateRepository))
                 .stream()
-                .flatMap(Collection::stream)
                 .map(certificateMappingService::mapToDto)
-                .collect(Collectors.toList());
-        return getCertificateDTOSWithTags(certificates);
+                .toList();
     }
 
     @Transactional
     @Override
-    public void update(GiftCertificateDTO giftCertificateDTO) {
+    public GiftCertificateDTO update(GiftCertificateDTO giftCertificateDTO) {
         Validate.notNull(giftCertificateDTO, "GiftCertificateDTO can't be Null");
         if (giftCertificateDTO.getId() < 1 || giftCertificateDTO.getId() == null) {
             log.error("[GiftCertificateService.update()] An exception occurs: given ID:[{}]" +
@@ -151,26 +155,34 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             throw new IllegalArgumentException("Given ID can't be less than zero or null");
         }
 
-        GiftCertificate giftCertificate = certificateMappingService.mapFromDto(giftCertificateDTO);
+        GiftCertificate giftCertificate = certificateMappingService.mapFromDto(findById(giftCertificateDTO.getId()));
+        if (giftCertificateDTO.getName() != null && !giftCertificateDTO.getName().isEmpty()) {
+            giftCertificate.setName(giftCertificateDTO.getName());
+        }
+        if (giftCertificateDTO.getDescription() != null && !giftCertificateDTO.getDescription().isEmpty()) {
+            giftCertificate.setDescription(giftCertificateDTO.getDescription());
+        }
+        if (giftCertificateDTO.getDuration() != null && giftCertificateDTO.getDuration() > 0) {
+            giftCertificate.setDuration(giftCertificateDTO.getDuration());
+        }
+        if (giftCertificateDTO.getPrice() != null && giftCertificateDTO.getPrice() > 0) {
+            giftCertificate.setPrice(giftCertificateDTO.getPrice());
+        }
+        if (giftCertificateDTO.getTags() != null && !giftCertificateDTO.getTags().isEmpty()) {
+            Set<Tag> tags = giftCertificateDTO.getTags().stream()
+                    .map(tagMappingService::mapFromDto).collect(Collectors.toSet());
+            giftCertificate.setTags(tags);
+        }
         giftCertificate.setLastUpdateDate(LocalDateTime.now());
-        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
-                try {
-                    giftCertificateRepository.update(giftCertificate);
-                    attachAndSaveTags(giftCertificate);
-                    log.debug("[GiftCertificateService.update()] GiftCertificate with ID:[{}] updated.",
-                            giftCertificateDTO.getId());
-                } catch (Exception e) {
-                    transactionStatus.setRollbackOnly();
-                    log.error("[GiftCertificateService.update()] rollback !!!");
-                }
-            }
-        });
+        giftCertificateRepository.save(giftCertificate);
+        log.debug("[GiftCertificateService.update()] GiftCertificate with ID:[{}] updated.",
+                giftCertificateDTO.getId());
+
+        return certificateMappingService.mapToDto(giftCertificate);
     }
 
     @Override
-    public void deleteById(Long id) {
+    public GiftCertificateDTO deleteById(Long id) {
         if (id == null || id < 1) {
             log.error("[GiftCertificateService.deleteById()] " +
                     "An exception occurs: id:[{}] can't be less than zero or null", id);
@@ -182,63 +194,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             throw new GiftCertificateNotFoundException(String
                     .format("Certificate with given id:[%d] not found for delete.", id));
         }
-        giftCertificateRepository.deleteById(id);
+
         log.debug("[GiftCertificateService.deleteById()] GiftCertificate for ID:[{}] removed.", id);
-    }
-
-    /**This method implements functionality of saving {@link Tag}
-     * to into database and attaching Tag to {@link GiftCertificate}
-     * during save or update operation.
-     * @param giftCertificate value that will be attached to certain Tag in database table
-     */
-    private void attachAndSaveTags(GiftCertificate giftCertificate) {
-        if (!giftCertificate.getTags().isEmpty()) {
-            giftCertificate.getTags().forEach(tag -> {
-                if (!tagRepository.isExists(tag)) {
-                    tagRepository.save(tag);
-                }
-            });
-            giftCertificate.getTags().forEach(tag -> {
-                if (tagRepository.findByName(tag.getName()).isPresent()) {
-                    Long tagId = tagRepository.findByName(tag.getName()).get().getId();
-                    giftCertificateRepository.attachTagToCertificate(tagId, giftCertificate.getId());
-                }
-            });
-        }
-    }
-
-    /**This method implements functionality of receiving {@link Tag} objects
-     * from database which depends on GiftCertificate#id field
-     * @param giftCertificateDTO is used for search Tags by {@link GiftCertificate#getId()}
-     * which returns Long datatype field
-     * @return List of TagDTOs received from database
-     */
-
-    private List<TagDTO> getMappedAndCollected(GiftCertificateDTO giftCertificateDTO) {
-        return tagRepository.findAllByCertificate(giftCertificateDTO.getId())
-                .stream()
-                .flatMap(Collection::stream)
-                .map(tagMappingService::mapToDto)
-                .collect(Collectors.toList());
-    }
-
-    /**This method implements mapping of received from repository
-     *  layer {@link Tag} to {@link TagDTO} for each GiftCertificate.
-     * @param certificates received from database GiftCertificates
-     * @return List of {@link GiftCertificateDTO} with mapped Tags;
-     */
-    private List<GiftCertificateDTO> getCertificateDTOSWithTags(List<GiftCertificateDTO> certificates) {
-        if (certificates.isEmpty()) {
-            log.error("[GiftCertificateService.findAll()] GiftCertificates not found");
-            throw new GiftCertificateNotFoundException("GiftCertificates not found");
-        } else {
-            for (GiftCertificateDTO certificateDTO : certificates) {
-                List<TagDTO> tagDTOS = getMappedAndCollected(certificateDTO);
-                certificateDTO.setTags(new HashSet<>(tagDTOS));
-            }
-            log.debug("[GiftCertificateService.findAll()] GiftCertificates received from database: [{}]"
-                    , certificates);
-            return certificates;
-        }
+        return certificateMappingService.mapToDto(giftCertificateRepository.deleteById(id));
     }
 }

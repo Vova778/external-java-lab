@@ -1,28 +1,26 @@
 package com.epam.esm.service.mapping.impl;
 
 import com.epam.esm.dto.GiftCertificateDTO;
+import com.epam.esm.dto.TagDTO;
 import com.epam.esm.model.GiftCertificate;
 import com.epam.esm.model.Tag;
 import com.epam.esm.service.mapping.MappingService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class GiftCertificateMappingServiceImpl
-        implements MappingService<GiftCertificate, GiftCertificateDTO> {
-
+@RequiredArgsConstructor
+public class GiftCertificateMappingServiceImpl implements MappingService<GiftCertificate, GiftCertificateDTO> {
+    private final MappingService<Tag, TagDTO> tagMappingService;
     @Override
-    public GiftCertificate mapFromDto(GiftCertificateDTO dto) {
+    public GiftCertificate mapFromDto(GiftCertificateDTO certificateDTO) {
         GiftCertificate model = new GiftCertificate();
-        BeanUtils.copyProperties(dto, model);
-        if (dto.getTags() != null && !dto.getTags().isEmpty()) {
-            dto.getTags().forEach(tagDTO -> {
-                Tag tag = new Tag();
-                BeanUtils.copyProperties(tagDTO, tag);
-                model.getTags().add(tag);
-            });
+        BeanUtils.copyProperties(certificateDTO, model);
+        if (certificateDTO.getTags() != null && !certificateDTO.getTags().isEmpty()) {
+            certificateDTO.getTags().forEach(tagDTO -> model.getTags().add(tagMappingService.mapFromDto(tagDTO)));
         }
         log.debug("[GiftCertificateMappingService] GiftCertificateDTO converted to GiftCertificate model: [{}]", model);
         return model;
@@ -30,9 +28,12 @@ public class GiftCertificateMappingServiceImpl
 
     @Override
     public GiftCertificateDTO mapToDto(GiftCertificate model) {
-        GiftCertificateDTO dto = new GiftCertificateDTO();
-        BeanUtils.copyProperties(model, dto);
-        log.debug("[GiftCertificateMappingService] GiftCertificate model converted to GiftCertificateDTO: [{}]", dto);
-        return dto;
+        GiftCertificateDTO giftCertificateDTO = new GiftCertificateDTO();
+        BeanUtils.copyProperties(model, giftCertificateDTO);
+        if (model.getTags() != null && !model.getTags().isEmpty()) {
+            model.getTags().forEach(tag -> giftCertificateDTO.getTags().add(tagMappingService.mapToDto(tag)));
+        }
+        log.debug("[GiftCertificateMappingService.mapToDTO()] Model converted to DTO: [{}]", giftCertificateDTO);
+        return giftCertificateDTO;
     }
 }
