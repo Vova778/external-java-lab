@@ -29,11 +29,12 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagDTO save(TagDTO tagDTO) throws TagAlreadyExistsException {
         Tag tag = mappingService.mapFromDto(tagDTO);
-        log.debug("is exists tag : {}", tagRepository.isExists(tag));
+
         if (tagRepository.isExists(tag)) {
             log.error("[TagService.save()] Tag with given name:[{}] already exists.", tagDTO.getName());
             throw new TagAlreadyExistsException(String.format("Tag with given name:[%s] already exists.", tagDTO.getName()));
         }
+
         return mappingService.mapToDto(tagRepository.save(tag));
     }
 

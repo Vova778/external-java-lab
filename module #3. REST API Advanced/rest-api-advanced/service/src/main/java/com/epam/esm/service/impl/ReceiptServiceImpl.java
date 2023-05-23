@@ -9,7 +9,7 @@ import com.epam.esm.model.Receipt;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.ReceiptService;
 import com.epam.esm.service.UserService;
-import com.epam.esm.service.mapping.impl.ReceiptMappingServiceImpl;
+import com.epam.esm.service.mapping.MappingService;
 import com.epam.esm.utils.Pageable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,13 +30,14 @@ import static com.epam.esm.service.validator.PageableValidator.validate;
 @RequiredArgsConstructor
 public class ReceiptServiceImpl implements ReceiptService {
     private final ReceiptRepository receiptRepository;
-    private final ReceiptMappingServiceImpl mappingService;
+    private final MappingService<Receipt, ReceiptDTO> mappingService;
     private final UserService userService;
     private final GiftCertificateService giftCertificateService;
 
     @Override
     public ReceiptDTO save(ReceiptDTO receiptDTO) {
-        Validate.notNull(receiptDTO, "[ReceiptService.save()] ReceiptDTO can't be null!");
+        Validate.notNull(receiptDTO,
+                "[ReceiptService.save()] ReceiptDTO can't be null!");
         Long userId = receiptDTO.getUserDTO().getId();
         receiptDTO.setUserDTO(userService.findById(userId));
         setGiftCertificatesAndPrice(receiptDTO);

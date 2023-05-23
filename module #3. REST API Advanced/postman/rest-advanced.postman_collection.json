@@ -1,0 +1,677 @@
+{
+  "info": {
+    "_postman_id": "40ce61b2-9c0a-43f1-84c3-fc4e9887aac6",
+    "name": "rest-advanced",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "certificate-save",
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n        \"name\": \"big dataz\",\r\n        \"description\": \"specific\",\r\n        \"price\": 55.0,\r\n        \"duration\": 2,\r\n        \"tags\": [{\r\n                \"name\": \"scala\"\r\n            },\r\n            {\r\n                \"name\": \"java\"\r\n            },\r\n            {   \r\n                \"name\": \"python\"\r\n            },\r\n             {   \r\n                \"name\": \"go\"\r\n            }]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/certificates/create",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "certificates",
+            "create"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "certificate-save-rollback",
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n        \"name\": \"big datas\",\r\n        \"description\": \"specific\",\r\n        \"price\": 55.0,\r\n        \"duration\": 2,\r\n        \"tags\": [{\r\n                \"name\": null\r\n            },\r\n            {\r\n                \"name\": \"java\"\r\n            },\r\n            {   \r\n                \"name\": \"python\"\r\n            }]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/certificates/create",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "certificates",
+            "create"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "certificate-get-all",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/certificates/find-all?page=1&pageSize=3",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "certificates",
+            "find-all"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "pageSize",
+              "value": "3"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "certificate-get-by-name",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/certificates/find?name=m&page=1&pageSize=10",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "certificates",
+            "find"
+          ],
+          "query": [
+            {
+              "key": "name",
+              "value": "m"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "pageSize",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "certificate-get-by-tags",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "[\r\n    \"java\",\r\n    \"kotlin\"\r\n]",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/certificates/find-by-tags?page=1&pageSize=2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "certificates",
+            "find-by-tags"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "pageSize",
+              "value": "2"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "certificate-get-by-id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/certificates/find/5",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "certificates",
+            "find",
+            "5"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "certificate-get-all-with-params",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/certificates/find-all-with-params?tagName=&name=c&description=&sortByName=ASC&sortByDate=?page=1&pageSize=10",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "certificates",
+            "find-all-with-params"
+          ],
+          "query": [
+            {
+              "key": "tagName",
+              "value": ""
+            },
+            {
+              "key": "name",
+              "value": "c"
+            },
+            {
+              "key": "description",
+              "value": ""
+            },
+            {
+              "key": "sortByName",
+              "value": "ASC"
+            },
+            {
+              "key": "sortByDate",
+              "value": "?page=1"
+            },
+            {
+              "key": "pageSize",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "certificate-update",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n        \"id\": 5,\r\n        \"name\": \"Big d\",\r\n        \"description\": \"best choice\",\r\n        \"price\": 1488.0,\r\n        \"duration\": 5,\r\n        \"tags\": [\r\n            {\r\n                \"name\": \"groovy\"\r\n            }\r\n        ]\r\n    }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/certificates/update",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "certificates",
+            "update"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "certificate-update-rollback",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n        \"id\": 1,\r\n        \"name\": \"Java\",\r\n        \"description\": \"best choice\",\r\n        \"price\": 1488.0,\r\n        \"duration\": 5,\r\n        \"tags\": [\r\n            {\r\n                \"name\": null\r\n            }\r\n        ]\r\n    }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/certificates/update",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "certificates",
+            "update"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "certificate-delete",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/certificates/delete/5",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "certificates",
+            "delete",
+            "5"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "tag-save",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": " {\r\n        \"name\": \"new tag\"\r\n    }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/tags/create",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tags",
+            "create"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "tag-get-all",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/tags/find-all?page=0&pageSize=1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tags",
+            "find-all"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            },
+            {
+              "key": "pageSize",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "tag-get-by-id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/tags/find/8",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tags",
+            "find",
+            "8"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "tag-get-by-name",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/tags/find?name=java",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tags",
+            "find"
+          ],
+          "query": [
+            {
+              "key": "name",
+              "value": "java"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "tag-delete",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/tags/delete/8",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tags",
+            "delete",
+            "8"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "user-get-all",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": " {\r\n        \"name\": \"java\"\r\n    }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/users/find-all?page=120&pageSize=20",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "users",
+            "find-all"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "120"
+            },
+            {
+              "key": "pageSize",
+              "value": "20"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "user-get-by-firstname",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/users/find?name=a&page=1&pageSize=10",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "users",
+            "find"
+          ],
+          "query": [
+            {
+              "key": "name",
+              "value": "a"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "pageSize",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "user-get-by-id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/users/find/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "users",
+            "find",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "receipt-save",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": " [\r\n     1, 2, 3\r\n ]",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/receipts/create/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "receipts",
+            "create",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "receipt-get-all",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/receipts/find-all?page=1&pageSize=10",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "receipts",
+            "find-all"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "pageSize",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "receipt-get-by-id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/receipts/find/2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "receipts",
+            "find",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "receipts-delete",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/receipts/delete/2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "receipts",
+            "delete",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

@@ -3,8 +3,9 @@ package com.epam.esm.service.impl;
 import com.epam.esm.UserRepository;
 import com.epam.esm.dto.UserDTO;
 import com.epam.esm.exception.model.UserNotFoundException;
+import com.epam.esm.model.User;
 import com.epam.esm.service.UserService;
-import com.epam.esm.service.mapping.impl.UserMappingServiceImpl;
+import com.epam.esm.service.mapping.MappingService;
 import com.epam.esm.utils.Pageable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ import static com.epam.esm.service.validator.PageableValidator.validate;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final UserMappingServiceImpl mappingService;
+    private final MappingService<User, UserDTO> mappingService;
 
     @Override
     public UserDTO save(UserDTO object) {
@@ -44,6 +45,7 @@ public class UserServiceImpl implements UserService {
         log.debug("[UserService.findById()] User received from database: [{}], for ID:[{}]", userDTO, id);
         return userDTO;
     }
+
 
     @Override
     public UserDTO findByName(String name) {

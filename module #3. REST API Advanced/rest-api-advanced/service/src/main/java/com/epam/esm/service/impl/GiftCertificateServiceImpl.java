@@ -41,8 +41,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public GiftCertificateDTO save(GiftCertificateDTO giftCertificateDTO) {
         GiftCertificate certificate = certificateMappingService.mapFromDto(giftCertificateDTO);
         if (giftCertificateRepository.isExists(certificate)) {
-            log.error("[GiftCertificateService.save()] GiftCertificate with given name:[{}] already exists.",
-                    giftCertificateDTO.getName());
             throw new GiftCertificateAlreadyExistsException(String.format(
                     "GiftCertificate with given name:[%s] already exists.", giftCertificateDTO.getName()));
         }
