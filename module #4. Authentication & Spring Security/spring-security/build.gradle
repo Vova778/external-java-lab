@@ -1,0 +1,80 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.0.6'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'application'
+}
+
+springBoot {
+    mainClass = 'com.epam.esm.StarterApplication'
+}
+
+bootJar {
+    mainClassName = 'com.epam.esm.StarterApplication'
+}
+
+dependencies {
+    implementation project(':controller')
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    group = 'com.epam.esm'
+    version = '1.0'
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        /*implementation 'org.springframework.boot:spring-boot-starter-data-jpa'*/
+        // https://mvnrepository.com/artifact/org.springframework/spring-orm
+        implementation group: 'org.springframework', name: 'spring-orm', version: '6.0.8'
+        // https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core
+        implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.2.2.Final'
+        // https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-envers
+        implementation group: 'org.hibernate.orm', name: 'hibernate-envers', version: '6.2.2.Final'
+
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: '3.0.6'
+        // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '3.0.6'
+        // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-log4j2
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-log4j2', version: '3.0.6'
+
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+        // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+        implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+    }
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+        configureEach {
+            exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        }
+    }
+
+    bootJar {
+        enabled = false
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+}
