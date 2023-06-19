@@ -7,7 +7,7 @@
  * in the user manual at https://docs.gradle.org/8.0.2/userguide/multi_project_builds.html
  */
 
-rootProject.name = 'rest-api-basic'
+rootProject.name = 'spring-security'
 include 'core'
 include 'repository'
 include 'service'
