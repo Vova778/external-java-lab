@@ -8,10 +8,18 @@ SET @OLD_SQL_MODE = @@SQL_MODE, SQL_MODE =
 -- -----------------------------------------------------
 -- Schema external_lab
 -- -----------------------------------------------------
-
+DROP SCHEMA IF EXISTS external_lab;
 CREATE SCHEMA IF NOT EXISTS `external_lab` DEFAULT CHARACTER SET utf8mb3;
 USE `external_lab`;
-
+-- -----------------------------------------------------
+-- Table `external_lab`.`revinfo` for envers audit
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `external_lab`.`REVINFO`
+(
+    `REV`      INTEGER NOT NULL AUTO_INCREMENT,
+    `REVTSTMP` BIGINT,
+    PRIMARY KEY (`REV`)
+);
 -- -----------------------------------------------------
 -- Table `external_lab`.`gift_certificate`
 -- -----------------------------------------------------
@@ -30,8 +38,22 @@ CREATE TABLE IF NOT EXISTS `external_lab`.`gift_certificate`
     ENGINE = InnoDB
     AUTO_INCREMENT = 5
     DEFAULT CHARACTER SET = utf8mb3;
-
-
+-- -----------------------------------------------------
+-- Table `external_lab`.`gift_certificates_audit`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `external_lab`.`gift_certificates_AUD`
+(
+    `id`               BIGINT       NOT NULL,
+    `name`             VARCHAR(45)  ,
+    `description`      VARCHAR(255) ,
+    `price`            FLOAT        ,
+    `duration`         INT          ,
+    `create_date`      DATETIME(3)  ,
+    `last_update_date` DATETIME(3)  ,
+    `REV`              INTEGER      NOT NULL,
+    `REVTYPE`          TINYINT,
+    PRIMARY KEY (`id`, `REV`)
+);
 -- -----------------------------------------------------
 -- Table `external_lab`.`tag`
 -- -----------------------------------------------------
@@ -45,7 +67,17 @@ CREATE TABLE IF NOT EXISTS `external_lab`.`tag`
     ENGINE = InnoDB
     AUTO_INCREMENT = 31
     DEFAULT CHARACTER SET = utf8mb3;
-
+-- -----------------------------------------------------
+-- Table `external_lab`.`tags_audit`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `external_lab`.`tags_AUD`
+(
+    `id`      BIGINT      NOT NULL,
+    `name`    VARCHAR(45) ,
+    `REV`     INTEGER     NOT NULL,
+    `REVTYPE` TINYINT,
+    PRIMARY KEY (`id`, `REV`)
+);
 
 -- -----------------------------------------------------
 -- Table `external_lab`.`gift_certificate_has_tag`
@@ -75,12 +107,14 @@ CREATE TABLE IF NOT EXISTS `external_lab`.`gift_certificate_has_tag`
 -- -----------------------------------------------------
 -- Table `external_lab`.`user`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `external_lab`.`users`
+CREATE TABLE IF NOT EXISTS `external_lab`.user
 (
     `id`         BIGINT       NOT NULL AUTO_INCREMENT,
     `email`      VARCHAR(255) NOT NULL,
     `first_name` VARCHAR(255) NOT NULL,
     `last_name`  VARCHAR(255) NOT NULL,
+    `password`   VARCHAR(255) NOT NULL,
+    `user_role`  ENUM('CUSTOMER', 'ADMIN') NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE
 )
@@ -95,21 +129,31 @@ CREATE TABLE IF NOT EXISTS `external_lab`.`users`
 CREATE TABLE IF NOT EXISTS `external_lab`.`receipt`
 (
     `id`          BIGINT      NOT NULL AUTO_INCREMENT,
-    `price`       DOUBLE      NOT NULL ,
-    `title`       VARCHAR(45) NOT NULL UNIQUE,
-    `create_date` DATETIME(6) NOT NULL ,
+    `price`       DOUBLE      NOT NULL,
+    `create_date` DATETIME(6) NOT NULL,
     `user_id`     BIGINT      NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `user_id_UNIQUE` (`user_id` ASC) VISIBLE,
     CONSTRAINT `receipt_user_id`
         FOREIGN KEY (`user_id`)
-            REFERENCES `external_lab`.`users` (`id`)
+            REFERENCES `external_lab`.user (`id`)
             ON DELETE CASCADE
             ON UPDATE CASCADE
 )
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb3;
-
+-- -----------------------------------------------------
+-- Table `external_lab`.`receipts_audit`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `external_lab`.`receipts_AUD`
+(
+    `id`          BIGINT      NOT NULL AUTO_INCREMENT,
+    `price`       DOUBLE      ,
+    `create_date` DATETIME(6) ,
+    `REV`         INTEGER     NOT NULL,
+    `REVTYPE`     TINYINT,
+    PRIMARY KEY (`id`, `REV`)
+);
 
 -- -----------------------------------------------------
 -- Table `external_lab`.`receipt_has_gift_certificate`
@@ -133,7 +177,6 @@ CREATE TABLE IF NOT EXISTS `external_lab`.`receipt_has_gift_certificate`
 )
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb3;
-
 
 SET SQL_MODE = @OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;

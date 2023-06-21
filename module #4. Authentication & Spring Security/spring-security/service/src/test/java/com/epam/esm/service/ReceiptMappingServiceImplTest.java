@@ -8,6 +8,7 @@ import com.epam.esm.exception.model.ReceiptNotFoundException;
 import com.epam.esm.model.entity.GiftCertificate;
 import com.epam.esm.model.entity.Receipt;
 import com.epam.esm.model.entity.User;
+import com.epam.esm.model.enums.UserRole;
 import com.epam.esm.service.impl.ReceiptServiceImpl;
 import com.epam.esm.service.mapping.MappingService;
 import com.epam.esm.utils.Pageable;
@@ -68,7 +69,7 @@ public class ReceiptMappingServiceImplTest {
         giftCertificatesDTO = new HashSet<>();
         Long userId = 1L;
         userDTO = new UserDTO(userId, "test@gmail.com", "John", "Doe");
-        user = new User(userId, "test@gmail.com", "John", "Doe");
+        user = new User(userId, "test@gmail.com", "John", "Doe","11111111", UserRole.USER,new HashSet<>());
         expectedReceipt = new Receipt(id, title, price, createDate, user, giftCertificates);
         receiptDTO = new ReceiptDTO(id, price, createDate, userDTO, giftCertificatesDTO);
         dtoList = new ArrayList<>(List.of(receiptDTO));
