@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,10 +23,16 @@ import java.util.Optional;
 @Getter
 public class UserJPARepository implements UserRepository {
     private static final String FIND_BY_NAME = "SELECT u FROM User u WHERE u.firstName= :name";
+    private static final String FIND_BY_EMAIL = "SELECT u FROM User u WHERE u.email = :email";
+    private static final String FIND_BY_RECEIPT = "SELECT r.user FROM Receipt r WHERE r.id = :id";
     private static final String FIND_ALL = "SELECT u FROM User u";
     private static final String FIND_ALL_BY_NAME = "SELECT u FROM User u WHERE LOWER(u.firstName) LIKE LOWER(:name)";
     private static final String GET_TOTAL_RECORDS = "SELECT COUNT(u.id) from User u";
-    private static final int PAGE_SIZE = 10;
+    private static final String GET_TOTAL_RECORDS_FOR_NAME_LIKE = "SELECT COUNT(u.id) from User u WHERE " +
+            "LOWER(u.firstName) LIKE LOWER(:name) ";
+
+
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -33,10 +40,49 @@ public class UserJPARepository implements UserRepository {
     public boolean isExists(User object) {
         throw new UnsupportedOperationException();
     }
+    public boolean isExistsByEmail(User user) {
+        log.debug("[UserJPARepository.isExistsByEmail()] Email for search: [{}]", user.getEmail());
+        return findByEmail(user.getEmail()).isPresent();
+    }
+    @Override
+    public Optional<User> findByReceipt(Long receiptID) {
+        Optional<User> result;
+        try {
+            result = Optional.ofNullable(entityManager
+                    .createQuery(FIND_BY_RECEIPT, User.class)
+                    .setParameter("id", receiptID)
+                    .getSingleResult());
+        } catch (NoResultException e) {
+            log.error("[UserJPARepository.findByReceipt()] NoResultException," +
+                    " Optional.empty() has been returned!");
+            return Optional.empty();
+        }
+        return result;
+    }
 
     @Override
-    public User save(User object) {
-        throw new UnsupportedOperationException();
+    public Optional<User> findByEmail(String email) {
+        Optional<User> result;
+        log.debug("[UserJPARepository.findByEmail()] Email for search: [{}}", email);
+        try {
+            result = Optional.ofNullable(entityManager
+                    .createQuery(FIND_BY_EMAIL, User.class)
+                    .setParameter("email", email)
+                    .getSingleResult());
+
+        } catch (NoResultException e) {
+            log.error("[UserJPARepository.findByEmail()] NoResultException, Optional.empty() returned!");
+            return Optional.empty();
+        }
+        log.debug("[UserJPARepository.findByEmail()] Optional user result: [{}]", result);
+        return result;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public User save(User user) {
+        entityManager.persist(user);
+        return user;
     }
 
     @Override
@@ -44,6 +90,7 @@ public class UserJPARepository implements UserRepository {
         User user = entityManager.find(User.class, id);
         return Optional.ofNullable(user);
     }
+
 
     @Override
     public Optional<User> findByName(String name) {
@@ -53,7 +100,8 @@ public class UserJPARepository implements UserRepository {
             query.setParameter("name", name);
             result = Optional.ofNullable(query.getSingleResult());
         } catch (NoResultException e) {
-            log.error("[UserJPARepository.findByName()] NoResultException, Optional.empty() has been returned!!!");
+            log.error("[UserJPARepository.findByName()] NoResultException," +
+                    " Optional.empty() has been returned!");
             return Optional.empty();
         }
         return result;
@@ -88,5 +136,11 @@ public class UserJPARepository implements UserRepository {
     public Long getTotalRecords() {
         TypedQuery<Long> countQuery = entityManager.createQuery(GET_TOTAL_RECORDS, Long.class);
         return countQuery.getSingleResult();
+    }
+    public Long getTotalRecordsForNameLike(String name) {
+        return entityManager
+                .createQuery(GET_TOTAL_RECORDS_FOR_NAME_LIKE, Long.class)
+                .setParameter("name", "%" + name + "%")
+                .getSingleResult();
     }
 }

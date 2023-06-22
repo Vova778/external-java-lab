@@ -39,4 +39,5 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         log.debug("[UserDetailsService.loadUserByUsername()] User:[{}] with eMail:[{}} has been received.", user, eMail);
         return user;
     }
+
 }
