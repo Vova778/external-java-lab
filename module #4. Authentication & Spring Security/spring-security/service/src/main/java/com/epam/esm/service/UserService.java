@@ -1,11 +1,16 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.UserDTO;
-import com.epam.esm.utils.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+public interface UserService {
+    UserDTO save(UserDTO userDTO);
+    UserDTO findById(Long id);
 
-public interface UserService extends GenericService<UserDTO, Long> {
-    UserDTO findByName(String name);
-    List<UserDTO> findAllByName(String name, Pageable pageable);
+    Page<UserDTO> findAll(Pageable pageable);
+
+    Page<UserDTO> findAllByName(String name, Pageable pageable);
+
+    UserDTO findByReceipt(Long receiptID);
 }

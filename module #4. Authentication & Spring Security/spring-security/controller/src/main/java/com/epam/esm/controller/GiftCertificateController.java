@@ -1,14 +1,20 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.controller.assembler.GiftCertificateModalAssembler;
-import com.epam.esm.controller.modal.GiftCertificateModal;
+import com.epam.esm.controller.assembler.GiftCertificateModelAssembler;
+import com.epam.esm.controller.assembler.TagModelAssembler;
+import com.epam.esm.controller.modal.GiftCertificateModel;
+import com.epam.esm.controller.modal.TagModel;
 import com.epam.esm.dto.GiftCertificateDTO;
+import com.epam.esm.dto.TagDTO;
 import com.epam.esm.service.GiftCertificateService;
-import com.epam.esm.utils.Pageable;
+import com.epam.esm.service.TagService;
 import com.epam.esm.utils.QueryParameters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,58 +27,61 @@ import java.util.Set;
 @Slf4j
 public class GiftCertificateController {
     private final GiftCertificateService giftCertificateService;
-    private final GiftCertificateModalAssembler giftCertificateModalAssembler;
-
+    private final TagService tagService;
+    private final GiftCertificateModelAssembler giftCertificateModelAssembler;
+    private final TagModelAssembler tagModelAssembler;
+    private final PagedResourcesAssembler<GiftCertificateDTO> certificatePagedResourcesAssembler;
+    private final PagedResourcesAssembler<TagDTO> tagPagedResourcesAssembler;
 
     @PostMapping("/create")
-    @ResponseStatus(HttpStatus.CREATED)
-    public GiftCertificateModal save(@RequestBody GiftCertificateDTO giftCertificateDTO) {
-        return giftCertificateModalAssembler
-                .toModel(giftCertificateService.save(giftCertificateDTO));
+    public ResponseEntity<GiftCertificateModel> save(@RequestBody GiftCertificateDTO giftCertificateDTO) {
+        GiftCertificateDTO certificateDTO = giftCertificateService.save(giftCertificateDTO);
+        GiftCertificateModel certificateModel = giftCertificateModelAssembler.toModel(certificateDTO);
+        return new ResponseEntity<>(certificateModel, HttpStatus.CREATED);
     }
 
     @GetMapping("/find/{id}")
-    public GiftCertificateModal findById(@PathVariable Long id) {
-        return giftCertificateModalAssembler
-                .toModel(giftCertificateService.findById(id));
+    public ResponseEntity<GiftCertificateModel> findByID(@PathVariable Long id) {
+        GiftCertificateDTO certificateDTO = giftCertificateService.findById(id);
+        GiftCertificateModel certificateModel = giftCertificateModelAssembler.toModel(certificateDTO);
+        return new ResponseEntity<>(certificateModel, HttpStatus.OK);
     }
 
     @GetMapping("/find")
-    public CollectionModel<GiftCertificateModal> findByName(@RequestParam String name,
-                                                            @RequestParam Integer page,
-                                                            @RequestParam Integer pageSize) {
-        return giftCertificateModalAssembler.toCollectionModel(
-                giftCertificateService.findAllByName(name, new Pageable(page, pageSize))
-                , page, pageSize);
+    public ResponseEntity<PagedModel<GiftCertificateModel>> findByName(@RequestParam String name,
+                                                                       Pageable pageable) {
+        Page<GiftCertificateDTO> certificatePage = giftCertificateService.findAllByName(name, pageable);
+        PagedModel<GiftCertificateModel> pagedModel = certificatePagedResourcesAssembler
+                .toModel(certificatePage, giftCertificateModelAssembler);
+        return new ResponseEntity<>(pagedModel, HttpStatus.OK);
     }
 
     @GetMapping("/find-all")
-    public CollectionModel<GiftCertificateModal> findAll(@RequestParam Integer page,
-                                                         @RequestParam Integer pageSize) {
-        return giftCertificateModalAssembler.toCollectionModel(
-                giftCertificateService.findAll(new Pageable(page, pageSize))
-                , page, pageSize);
+    public ResponseEntity<PagedModel<GiftCertificateModel>> findAll(Pageable pageable) {
+        Page<GiftCertificateDTO> certificatePage = giftCertificateService.findAll(pageable);
+        PagedModel<GiftCertificateModel> pagedModel = certificatePagedResourcesAssembler
+                .toModel(certificatePage, giftCertificateModelAssembler);
+        return new ResponseEntity<>(pagedModel, HttpStatus.OK);
     }
 
     @PostMapping("/find-by-tags")
-    public CollectionModel<GiftCertificateModal> findByTags(@RequestBody Set<String> tags,
-                                                            @RequestParam Integer page,
-                                                            @RequestParam Integer pageSize) {
+    public ResponseEntity<PagedModel<GiftCertificateModel>> findByTags(@RequestBody Set<String> tags,
+                                                                       Pageable pageable) {
         log.debug("FIND_BY_TAGS [{}]", tags);
-        return giftCertificateModalAssembler.toCollectionModel(
-                giftCertificateService.findAllByTags(tags, new Pageable(page, pageSize))
-                , page, pageSize);
-
+        Page<GiftCertificateDTO> certificatePage = giftCertificateService.findAllByTags(tags, pageable);
+        PagedModel<GiftCertificateModel> pagedModel = certificatePagedResourcesAssembler
+                .toModel(certificatePage, giftCertificateModelAssembler);
+        return new ResponseEntity<>(pagedModel, HttpStatus.OK);
     }
 
     @GetMapping("/find-all-with-params")
-    public CollectionModel<GiftCertificateModal> findAllWithParams(@RequestParam(required = false) String tagName,
-                                                                   @RequestParam(required = false) String name,
-                                                                   @RequestParam(required = false) String description,
-                                                                   @RequestParam(required = false) String sortByName,
-                                                                   @RequestParam(required = false) String sortByDate,
-                                                                   @RequestParam Integer page,
-                                                                   @RequestParam Integer pageSize) {
+    public ResponseEntity<PagedModel<GiftCertificateModel>> findAllWithParams(
+            @RequestParam(required = false) String tagName,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String sortByName,
+            @RequestParam(required = false) String sortByDate,
+            Pageable pageable) {
 
         QueryParameters queryParams = QueryParameters.builder()
                 .tagName(tagName)
@@ -81,23 +90,40 @@ public class GiftCertificateController {
                 .sortByName(sortByName)
                 .sortByDate(sortByDate)
                 .build();
-        return giftCertificateModalAssembler.toCollectionModel(
-                giftCertificateService.findAllWithParams(queryParams, new Pageable(page, pageSize))
-                , page, pageSize);
+        Page<GiftCertificateDTO> certificatePage = giftCertificateService.findAllWithParams(queryParams, pageable);
+        PagedModel<GiftCertificateModel> pagedModel = certificatePagedResourcesAssembler
+                .toModel(certificatePage, giftCertificateModelAssembler);
+        return new ResponseEntity<>(pagedModel, HttpStatus.OK);
+    }
 
+    @GetMapping("/find/{certificateID}/tags")
+    public ResponseEntity<PagedModel<TagModel>> findTagsByCertificate(@PathVariable Long certificateID,
+                                                                      Pageable pageable) {
+        Page<TagDTO> tagPage = tagService.findAllByCertificate(certificateID, pageable);
+        PagedModel<TagModel> pagedModel = tagPagedResourcesAssembler.toModel(tagPage, tagModelAssembler);
+        return new ResponseEntity<>(pagedModel, HttpStatus.OK);
     }
 
 
     @PatchMapping("/update")
-    public GiftCertificateModal update(@RequestBody GiftCertificateDTO giftCertificateDTO) {
-        return giftCertificateModalAssembler
-                .toModel(giftCertificateService.update(giftCertificateDTO));
+    public ResponseEntity<GiftCertificateModel> update(@RequestBody GiftCertificateDTO giftCertificateDTO) {
+        GiftCertificateDTO certificateDTO = giftCertificateService.update(giftCertificateDTO);
+        GiftCertificateModel certificateModel = giftCertificateModelAssembler.toModel(certificateDTO);
+        return new ResponseEntity<>(certificateModel, HttpStatus.OK);
+    }
+
+    @PatchMapping("/update-price")
+    public ResponseEntity<GiftCertificateModel> updatePrice(@RequestParam Long giftCertificateID,
+                                                            @RequestParam Double price) {
+        GiftCertificateDTO certificateDTO = giftCertificateService.updatePrice(giftCertificateID, price);
+        GiftCertificateModel certificateModel = giftCertificateModelAssembler.toModel(certificateDTO);
+        return new ResponseEntity<>(certificateModel, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-        giftCertificateService.deleteById(id);
-        return ResponseEntity.ok().build();
+    public GiftCertificateDTO deleteByID(@PathVariable Long id) {
+        return giftCertificateService.deleteById(id);
     }
+
 
 }

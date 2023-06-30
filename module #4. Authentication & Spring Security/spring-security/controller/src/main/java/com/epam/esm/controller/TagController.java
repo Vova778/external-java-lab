@@ -1,12 +1,14 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.controller.assembler.TagModalAssembler;
-import com.epam.esm.controller.modal.TagModal;
+import com.epam.esm.controller.assembler.TagModelAssembler;
+import com.epam.esm.controller.modal.TagModel;
 import com.epam.esm.dto.TagDTO;
 import com.epam.esm.service.TagService;
-import com.epam.esm.utils.Pageable;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,35 +18,46 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class TagController {
     private final TagService tagService;
-    private final TagModalAssembler tagModalAssembler;
+    private final TagModelAssembler tagModelAssembler;
+    private final PagedResourcesAssembler<TagDTO> pagedResourcesAssembler;
 
     @PostMapping("/create")
-    @ResponseStatus(HttpStatus.CREATED)
-    public TagModal save(@RequestBody TagDTO tagDTO) {
-        return tagModalAssembler.toModel(tagService.save(tagDTO));
+    public ResponseEntity<TagModel> save(@RequestBody TagDTO tag) {
+        TagDTO tagDTO = tagService.save(tag);
+        TagModel tagModel = tagModelAssembler.toModel(tagDTO);
+        return new ResponseEntity<>(tagModel, HttpStatus.CREATED);
     }
 
     @GetMapping("/find/{id}")
-    public TagModal findById(@PathVariable Long id) {
-        return tagModalAssembler.toModel(tagService.findById(id));
+    public ResponseEntity<TagModel> findByID(@PathVariable Long id) {
+        TagDTO tagDTO = tagService.findById(id);
+        TagModel tagModel = tagModelAssembler.toModel(tagDTO);
+        return new ResponseEntity<>(tagModel, HttpStatus.OK);
     }
 
     @GetMapping("/find")
-    public TagModal findByName(@RequestParam String name) {
-        return tagModalAssembler.toModel(tagService.findByName(name));
+    public ResponseEntity<TagModel> findByName(@RequestParam String name) {
+        TagDTO tagDTO = tagService.findByName(name);
+        TagModel tagModel = tagModelAssembler.toModel(tagDTO);
+        return new ResponseEntity<>(tagModel, HttpStatus.OK);
+    }
+
+    @GetMapping("/find-most-widely-used-tag")
+    public ResponseEntity<TagModel> findMostWidelyUsedTagOfUserWithHighestCostOfAllReceipts() {
+        TagDTO tagDTO = tagService.findMostWidelyUsedTagOfUserWithHighestCostOfAllReceipts();
+        TagModel tagModel = tagModelAssembler.toModel(tagDTO);
+        return new ResponseEntity<>(tagModel, HttpStatus.OK);
     }
 
     @GetMapping("/find-all")
-    public CollectionModel<TagModal> findAll(@RequestParam Integer page,
-                                             @RequestParam Integer pageSize) {
-        return tagModalAssembler
-                .toCollectionModel(
-                        tagService.findAll(new Pageable(page, pageSize)), page, pageSize);
+    public ResponseEntity<PagedModel<TagModel>> findAll(Pageable pageable) {
+        Page<TagDTO> pageTags = tagService.findAll(pageable);
+        PagedModel<TagModel> pagedModel = pagedResourcesAssembler.toModel(pageTags, tagModelAssembler);
+        return new ResponseEntity<>(pagedModel, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-        tagService.deleteById(id);
-        return ResponseEntity.ok().build();
+    public TagDTO deleteByID(@PathVariable Long id) {
+        return tagService.deleteByID(id);
     }
 }

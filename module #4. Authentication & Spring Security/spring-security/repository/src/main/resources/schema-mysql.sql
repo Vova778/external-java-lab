@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS `external_lab`.`gift_certificate_has_tag`
 -- -----------------------------------------------------
 -- Table `external_lab`.`user`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `external_lab`.user
+CREATE TABLE IF NOT EXISTS `external_lab`.`users`
 (
     `id`         BIGINT       NOT NULL AUTO_INCREMENT,
     `email`      VARCHAR(255) NOT NULL,
@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS `external_lab`.`receipt`
     INDEX `user_id_UNIQUE` (`user_id` ASC) VISIBLE,
     CONSTRAINT `receipt_user_id`
         FOREIGN KEY (`user_id`)
-            REFERENCES `external_lab`.user (`id`)
+            REFERENCES `external_lab`.`users` (`id`)
             ON DELETE CASCADE
             ON UPDATE CASCADE
 )
@@ -177,6 +177,21 @@ CREATE TABLE IF NOT EXISTS `external_lab`.`receipt_has_gift_certificate`
 )
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb3;
+
+CREATE TABLE IF NOT EXISTS `external_lab`.`token`
+(
+    `id`          BIGINT      NOT NULL AUTO_INCREMENT,
+    `jwt`         VARCHAR(255)  NOT NULL UNIQUE ,
+    `revoked`     BOOLEAN NOT NULL,
+    `expired`     BOOLEAN NOT NULL,
+    `user_id`     BIGINT      NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `token_user_id`
+        FOREIGN KEY (`user_id`)
+            REFERENCES `external_lab`.`users` (`id`)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
+);
 
 SET SQL_MODE = @OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;

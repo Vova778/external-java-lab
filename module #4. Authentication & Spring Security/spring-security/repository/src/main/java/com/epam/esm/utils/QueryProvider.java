@@ -21,6 +21,7 @@ public class QueryProvider {
     private static final String QUERY_PROVIDER = "[QueryProvider]";
     private static final String SELECT = "SELECT ";
     private static final String DISTINCT = " DISTINCT ";
+    private static final String COUNT = "COUNT (*) ";
     private static final String DESC = " DESC";
     private static final String WHERE = " WHERE ";
     private static final String AND = " AND ";
@@ -113,6 +114,40 @@ public class QueryProvider {
             sb.append(ORDER_BY).append(DATE);
             if (queryParams.getSortByDate().equalsIgnoreCase(DESC.trim()))
                 sb.append(DESC);
+        }
+    }
+
+    public String getTotalRecordsForParams() {
+        StringBuilder sb = new StringBuilder().append(SELECT).append(COUNT)
+                .append(FROM_GIFT_CERTIFICATE);
+        if (queryParams.getTagName() != null && !queryParams.getTagName().isEmpty()) {
+            sb.append(JOIN_TAG_HAS_CERTIFICATE).append(JOIN_TAG).append(WHERE).append(TAG_NAME)
+                    .append(LIKE).append(FRONT_PERCENT_SIGN).append(queryParams.getTagName()).append(BACK_PERCENT_SIGN);
+            getQueryDependsOnParamsForCount(sb, AND);
+        } else {
+            getQueryDependsOnParamsForCount(sb, WHERE);
+        }
+        log.warn("QUERY: {}", sb);
+        return sb.toString();
+    }
+
+    private void getQueryDependsOnParamsForCount(StringBuilder sb, String statement) {
+        if ((queryParams.getName() != null && !queryParams.getName().isEmpty())
+                && (queryParams.getDescription() != null && !queryParams.getDescription().isEmpty())) {
+            sb.append(statement).append(CERTIFICATE_NAME).append(LIKE).append(FRONT_PERCENT_SIGN)
+                    .append(queryParams.getName()).append(BACK_PERCENT_SIGN)
+                    .append(AND).append(DESCRIPTION).append(LIKE).append(FRONT_PERCENT_SIGN)
+                    .append(queryParams.getDescription()).append(BACK_PERCENT_SIGN);
+        } else if ((queryParams.getName() != null && !queryParams.getName().isEmpty())
+                && (queryParams.getDescription() == null || queryParams.getDescription().isEmpty())) {
+            sb.append(statement).append(CERTIFICATE_NAME).append(LIKE).append(FRONT_PERCENT_SIGN)
+                    .append(queryParams.getName())
+                    .append(BACK_PERCENT_SIGN);
+            getSortedByParam(sb);
+        } else if ((queryParams.getDescription() != null && !queryParams.getDescription().isEmpty())
+                && (queryParams.getName() == null || queryParams.getName().isEmpty())) {
+            sb.append(statement).append(DESCRIPTION).append(LIKE).append(FRONT_PERCENT_SIGN)
+                    .append(queryParams.getDescription()).append(BACK_PERCENT_SIGN);
         }
     }
 }

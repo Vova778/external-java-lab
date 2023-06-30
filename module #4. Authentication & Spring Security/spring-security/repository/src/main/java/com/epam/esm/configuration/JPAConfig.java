@@ -1,14 +1,21 @@
 package com.epam.esm.configuration;
 
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManager;
-import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.datasource.init.DatabasePopulator;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -19,10 +26,10 @@ import javax.sql.DataSource;
 import java.util.Objects;
 import java.util.Properties;
 
+
 @Slf4j
 @Configuration
 @EnableTransactionManagement
-@Profile("default")
 public class JPAConfig {
     @Value("${spring.jpa.show-sql}")
     private String showSql;
@@ -36,10 +43,31 @@ public class JPAConfig {
     private String dialect;
     @Value("${spring.jpa.properties.hibernate.default_schema}")
     private String defaultSchema;
+    @Value("${spring.datasource.driver-class-name}")
+    private String driverClassName;
+    @Value("${spring.datasource.url}")
+    private String url;
+    @Value("${spring.datasource.username}")
+    private String username;
+    @Value("${spring.datasource.password}")
+    private String password;
+    @Value("${spring.datasource.hikari.minimumIdle}")
+    private String minimumIdle;
+    @Value("${spring.datasource.hikari.maximumPoolSize}")
+    private String maxPoolSize;
+    @Value("${spring.datasource.hikari.idleTimeout}")
+    private String idleTimeout;
+    @Value("${spring.datasource.hikari.poolName}")
+    private String poolName;
+    @Value("${spring.datasource.hikari.maxLifetime}")
+    private String maxLifeTime;
+    @Value("${spring.datasource.hikari.connectionTimeout}")
+    private String connectionTimeout;
 
     @Bean
-    public DataSource dataSource() {
-        log.debug("DataSource created");
+    @Profile("default")
+    public DataSource defaultDataSource() {
+        log.debug("H2 DataSource created");
         return new EmbeddedDatabaseBuilder()
                 .setType(EmbeddedDatabaseType.H2)
                 .addScript("classpath:schema-h2.sql")
@@ -49,9 +77,41 @@ public class JPAConfig {
                 .build();
     }
 
-    @Primary
     @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+    @Profile("prod")
+    public DataSource prodDataSource() {
+        HikariDataSource dataSource;
+        HikariConfig config = new HikariConfig();
+
+        config.setDriverClassName(driverClassName);
+        config.setJdbcUrl(url);
+        config.setUsername(username);
+        config.setPassword(password);
+        config.setMaximumPoolSize(Integer.parseInt(maxPoolSize));
+        config.setMinimumIdle(Integer.parseInt(minimumIdle));
+        config.setIdleTimeout(Integer.parseInt(idleTimeout));
+        config.setPoolName(poolName);
+        config.setMaxLifetime(Integer.parseInt(maxLifeTime));
+        config.setConnectionTimeout(Integer.parseInt(connectionTimeout));
+
+        dataSource = new HikariDataSource(config);
+        log.debug("MySQL DataSource with HikariCP created");
+
+        Resource createSchema = new ClassPathResource("schema-mysql.sql");
+        DatabasePopulator databaseCreator = new ResourceDatabasePopulator(createSchema);
+        DatabasePopulatorUtils.execute(databaseCreator, dataSource);
+        log.debug("Schema creation script executed");
+
+        Resource initSchema = new ClassPathResource("data-mysql.sql");
+        DatabasePopulator databasePopulator = new ResourceDatabasePopulator(initSchema);
+        DatabasePopulatorUtils.execute(databasePopulator, dataSource);
+        log.debug("Schema initialization script executed");
+
+        return dataSource;
+    }
+
+    @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
         Properties properties = new Properties();
         properties.setProperty("hibernate.show_sql", showSql);
         properties.setProperty("hibernate.ddl-auto", hibernateDDLAuto);
@@ -61,22 +121,22 @@ public class JPAConfig {
         properties.setProperty("hibernate.default_schema", defaultSchema);
         LocalContainerEntityManagerFactoryBean emfBean = new LocalContainerEntityManagerFactoryBean();
         emfBean.setJpaProperties(properties);
-        emfBean.setDataSource(dataSource());
+        emfBean.setDataSource(dataSource);
         emfBean.setPackagesToScan("com.epam.esm");
         emfBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         log.debug("EntityManagerFactory created");
         return emfBean;
     }
-    @Primary
+
     @Bean
-    public EntityManager entityManager() {
-        return Objects.requireNonNull(entityManagerFactory().getObject()).createEntityManager();
+    public EntityManager entityManager(LocalContainerEntityManagerFactoryBean entityManagerFactory) {
+        return Objects.requireNonNull(entityManagerFactory.getObject()).createEntityManager();
     }
-    @Primary
+
     @Bean
-    public PlatformTransactionManager transactionManager() {
+    public PlatformTransactionManager transactionManager(LocalContainerEntityManagerFactoryBean entityManagerFactory) {
         JpaTransactionManager jpaTransactionManager = new JpaTransactionManager();
-        jpaTransactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
+        jpaTransactionManager.setEntityManagerFactory(entityManagerFactory.getObject());
         log.debug("JpaTransactionManager created");
         return jpaTransactionManager;
     }

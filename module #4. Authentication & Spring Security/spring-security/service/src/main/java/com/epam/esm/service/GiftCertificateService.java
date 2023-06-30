@@ -1,18 +1,30 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.GiftCertificateDTO;
-import com.epam.esm.utils.Pageable;
 import com.epam.esm.utils.QueryParameters;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Set;
 
-public interface GiftCertificateService extends GenericService<GiftCertificateDTO, Long> {
-    List<GiftCertificateDTO> findAllByTags(Set<String> tags, Pageable pageable);
+public interface GiftCertificateService {
+    GiftCertificateDTO save(GiftCertificateDTO giftCertificateDTO);
 
-    List<GiftCertificateDTO> findAllByName(String name, Pageable pageable);
+    GiftCertificateDTO findById(Long id);
 
-    List<GiftCertificateDTO> findAllWithParams(QueryParameters queryParams, Pageable pageable);
+    Page<GiftCertificateDTO> findAll(Pageable pageable);
+
+    Page<GiftCertificateDTO> findAllByTags(Set<String> tags, Pageable pageable);
+
+    Page<GiftCertificateDTO> findAllByName(String name, Pageable pageable);
+
+    Page<GiftCertificateDTO> findAllWithParams(QueryParameters queryParams, Pageable pageable);
+
+    Page<GiftCertificateDTO> findAllByReceipt(Long receiptID, Pageable pageable);
 
     GiftCertificateDTO update(GiftCertificateDTO giftCertificateDTO);
+
+    GiftCertificateDTO updatePrice(Long giftCertificateID, Double price);
+
+    GiftCertificateDTO deleteById(Long id);
 }

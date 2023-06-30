@@ -1,5 +1,6 @@
 package com.epam.esm.model.entity;
 
+import com.epam.esm.jwt.Token;
 import com.epam.esm.model.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,13 +8,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Data
 @Entity
 @Table(name = "users")
@@ -21,16 +20,20 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false, unique = true)
     private String email;
+
     @Column(name = "first_name", nullable = false)
     private String firstName;
+
     @Column(name = "last_name", nullable = false)
     private String lastName;
+
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "user_role", columnDefinition = "ENUM('GUEST', 'USER', 'ADMINISTRATOR')")
+    @Column(name = "user_role", columnDefinition = "ENUM('CUSTOMER', 'ADMIN')")
     @Enumerated(value = EnumType.STRING)
     private UserRole userRole;
 
@@ -39,6 +42,12 @@ public class User implements UserDetails {
     @Builder.Default
     @OneToMany(mappedBy = "user")
     private Set<Receipt> receipts = new HashSet<>();
+
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @Builder.Default
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens = new ArrayList<>();
 
     /**
      * Returns the authorities granted to the user. Cannot return <code>null</code>.
