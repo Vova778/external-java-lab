@@ -10,7 +10,6 @@ import com.epam.esm.model.entity.GiftCertificate;
 import com.epam.esm.model.entity.Tag;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.mapping.MappingService;
-import com.epam.esm.utils.QueryParameters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
@@ -44,7 +43,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         }
 
         GiftCertificate certificate = certificateMappingService.mapFromDto(giftCertificateDTO);
-        if (giftCertificateRepository.isExists(certificate)) {
+        if (giftCertificateRepository.existsByName(certificate.getName())) {
             log.error("[GiftCertificateService.save()] GiftCertificate with given name:[{}] already exists.",
                     giftCertificateDTO.getName());
             throw new GiftCertificateAlreadyExistsException(String.format(
@@ -73,7 +72,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             throw new IllegalArgumentException("GiftCertificate.id can't be less than zero or null");
         }
 
-        GiftCertificateDTO giftCertificateDTO = giftCertificateRepository.findByID(id)
+        GiftCertificateDTO giftCertificateDTO = giftCertificateRepository.findById(id)
                 .map(certificateMappingService::mapToDto)
                 .orElseThrow(() -> {
                     log.error("[GiftCertificateService.findById()] GiftCertificate for given ID:[{}] not found", id);
@@ -149,12 +148,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         }
 
         log.debug("[GiftCertificateService.findAll()] GiftCertificates received from database: [{}]", certificates);
-        Long totalRecords = giftCertificateRepository.getTotalRecords();
+        Long totalRecords = giftCertificateRepository.count();
         return new PageImpl<>(certificates, pageable, totalRecords);
 
     }
 
-    @Override
+   /* @Override
     public Page<GiftCertificateDTO> findAllWithParams(QueryParameters queryParams, Pageable pageable) {
         if (queryParams == null) {
             throw new IllegalArgumentException();
@@ -172,7 +171,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         Long totalRecords = giftCertificateRepository.getTotalRecordsForParams(queryParams);
         log.debug("[GiftCertificateService.findAllByParams()] Total records for params:[{}]", totalRecords);
         return new PageImpl<>(certificates, pageable, totalRecords);
-    }
+    }*/
 
     @Override
     public Page<GiftCertificateDTO> findAllByReceipt(Long receiptID, Pageable pageable) {
@@ -253,7 +252,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             throw new IllegalArgumentException("Given ID or Price can't be less than zero");
         }
 
-        GiftCertificate giftCertificate = giftCertificateRepository.findByID(giftCertificateID)
+        GiftCertificate giftCertificate = giftCertificateRepository.findById(giftCertificateID)
                 .orElseThrow(() -> {
                     log.error("[GiftCertificateService.updatePrice()] GiftCertificate for given ID:[{}] not found", giftCertificateID);
                     throw new GiftCertificateNotFoundException(String.format("GiftCertificate not found (id:[%d])", giftCertificateID));
@@ -269,16 +268,15 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public GiftCertificateDTO deleteById(Long id) {
+    public void deleteById(Long id) {
         if (id == null || id < 1) {
             log.error("[GiftCertificateService.deleteById()] " +
                     "An exception occurs: id:[{}] can't be less than zero or null", id);
             throw new IllegalArgumentException("GiftCertificate.id can't be less than zero or null");
         }
 
-        GiftCertificate removedGiftCertificate = giftCertificateRepository.deleteByID(id);
+        giftCertificateRepository.deleteById(id);
 
         log.debug("[GiftCertificateService.deleteById()] GiftCertificate for ID:[{}] removed.", id);
-        return certificateMappingService.mapToDto(removedGiftCertificate);
     }
 }

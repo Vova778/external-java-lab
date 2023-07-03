@@ -35,7 +35,7 @@ public class LogoutService implements LogoutHandler {
         }
         final String jwt = authHeader.substring(7);
 
-        Token storedToken = tokenRepository.findByToken(jwt)
+        Token storedToken = tokenRepository.findByJwt(jwt)
                 .orElseThrow(() -> {
                     log.error("[LogoutService.logout()] Token with given value:[{}] not found", jwt);
                     return new TokenNotFoundException(String.format("Token not found (value:[%s])", jwt));

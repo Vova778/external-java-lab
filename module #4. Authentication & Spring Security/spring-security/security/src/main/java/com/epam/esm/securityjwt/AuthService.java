@@ -50,7 +50,7 @@ public class AuthService {
 
         log.debug("[AuthService.signUp()] User to be saved: [{}}", user);
 
-        if (userRepository.isExistsByEmail(user)) {
+        if (userRepository.existsByEmail(user.getEmail())) {
             log.error("[AuthService.signUp()] User with given email:[{}] already exists.", user.getEmail());
             throw new UserAlreadyExistsException(String
                     .format("User with given email:[%s] already exists.", user.getEmail()));
@@ -121,7 +121,7 @@ public class AuthService {
                 .revoked(false)
                 .build();
 
-        boolean isTokenExists = tokenRepository.isExists(token);
+        boolean isTokenExists = tokenRepository.existsByJwt(token.getJwt());
 
         if (isTokenExists) {
             log.error("[AuthService.saveTokenForUser()] Token with given value:[{}] already exists.", jwtToken);

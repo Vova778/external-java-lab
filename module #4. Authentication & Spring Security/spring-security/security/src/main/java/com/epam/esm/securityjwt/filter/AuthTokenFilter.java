@@ -50,7 +50,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             log.debug("User is not authenticated yet...");
 
-            boolean isTokenValid = tokenRepository.findByToken(jwt)
+            boolean isTokenValid = tokenRepository.findByJwt(jwt)
                     .map(t -> !t.isExpired() && !t.isRevoked())
                     .orElse(false);
 

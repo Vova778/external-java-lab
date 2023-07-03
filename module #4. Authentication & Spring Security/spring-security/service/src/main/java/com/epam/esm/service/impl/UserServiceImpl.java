@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
 
         User user = mappingService.mapFromDto(userDTO);
 
-        if (userRepository.isExistsByEmail(user)) {
+        if (userRepository.existsByEmail(user.getEmail())) {
             log.error("[UserService.save()] User with given email:[{}] already exists.", userDTO.getEmail());
             throw new UserAlreadyExistsException(String
                     .format("User with given email:[%s] already exists.", userDTO.getEmail()));
@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("An exception occurs: Tag.id can't be less than zero or null");
         }
 
-        UserDTO userDTO = userRepository.findByID(id)
+        UserDTO userDTO = userRepository.findById(id)
                 .map(mappingService::mapToDto)
                 .orElseThrow(() -> {
                     log.error("[UserService.findById()] User for given ID:[{}] not found", id);
@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
                     name);
             throw new UserNotFoundException(String.format("User not found (name:[%s])", name));
         }
-        Long totalRecords = userRepository.getTotalRecordsForNameLike(name);
+        Long totalRecords = userRepository.countByFirstNameLikeIgnoreCase(name);
         return new PageImpl<>(users, pageable, totalRecords);
     }
 
@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException("Users not found");
         }
         log.debug("[UserService.findAll()] Users received from database: [{}]", users);
-        Long totalRecords = userRepository.getTotalRecords();
+        Long totalRecords = userRepository.count();
         return new PageImpl<>(users, pageable, totalRecords);
     }
 }

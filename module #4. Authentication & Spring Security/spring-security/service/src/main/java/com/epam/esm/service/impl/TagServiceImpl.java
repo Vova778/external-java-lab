@@ -33,7 +33,7 @@ public class TagServiceImpl implements TagService {
         }
 
         Tag tag = mappingService.mapFromDto(tagDTO);
-        if (tagRepository.isExists(tag)) {
+        if (tagRepository.existsByName(tag.getName())) {
             log.error("[TagService.save()] Tag with given name:[{}] already exists.", tagDTO.getName());
             throw new TagAlreadyExistsException(String.format("Tag with given name:[%s] already exists.", tagDTO.getName()));
         }
@@ -48,7 +48,7 @@ public class TagServiceImpl implements TagService {
             throw new IllegalArgumentException("An exception occurs: Tag.id can't be less than zero or null");
         }
 
-        TagDTO tagDTO = tagRepository.findByID(id)
+        TagDTO tagDTO = tagRepository.findById(id)
                 .map(mappingService::mapToDto)
                 .orElseThrow(() -> {
                     log.error("[TagService.findById()] Tag for given ID:[{}] not found", id);
@@ -95,15 +95,6 @@ public class TagServiceImpl implements TagService {
         return new PageImpl<>(tags, pageable, totalRecords);
     }
 
-    @Override
-    public TagDTO findMostWidelyUsedTagOfUserWithHighestCostOfAllReceipts() {
-        return tagRepository.findMostWidelyUsedTagOfUserWithHighestCostOfAllReceipts()
-                .map(mappingService::mapToDto)
-                .orElseThrow(() -> {
-                    log.error("[TagService.findMostWidelyUsedTagOfUserWithHighestCostOfAllReceipts()] Tag not found");
-                    throw new TagNotFoundException("Tag not found");
-                });
-    }
 
     @Override
     public Page<TagDTO> findAll(Pageable pageable) {
@@ -116,28 +107,27 @@ public class TagServiceImpl implements TagService {
             throw new TagNotFoundException("Tags not found");
         }
         log.debug("[TagService.findAll()] Tags received from database: [{}]", tags);
-        Long totalRecords = tagRepository.getTotalRecords();
+        Long totalRecords = tagRepository.count();
         return new PageImpl<>(tags, pageable, totalRecords);
     }
 
     @Override
-    public TagDTO deleteByID(Long id) {
+    public void deleteByID(Long id) {
         if (id == null || id < 1) {
             log.error("[TagService.deleteById()] An exception occurs: id:[{}] can't be less than zero", id);
             throw new IllegalArgumentException("Tag.id can't be less than zero.");
         }
 
-        Optional<Tag> tag = tagRepository.findByID(id);
+        Optional<Tag> tag = tagRepository.findById(id);
 
         log.debug("Delete tag : {}", tag);
-        if (tag.isEmpty() || !tagRepository.isExists(tag.get())) {
+        if (tag.isEmpty() || !tagRepository.existsById(tag.get().getId())) {
             log.error("[TagService.deleteById()] Tag with given id:[{}] not found.", id);
             throw new TagNotFoundException(String.format("Tag with given id:[%d] not found for delete.", id));
         }
 
-        Tag removedTag = tagRepository.deleteByID(id);
-
+        tagRepository.deleteById(id);
+        tagRepository.flush();
         log.debug("[TagService.deleteById()] Tag for ID:[{}] removed", id);
-        return mappingService.mapToDto(removedTag);
     }
 }

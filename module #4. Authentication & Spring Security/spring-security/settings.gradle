@@ -12,8 +12,6 @@ include 'core'
 include 'repository'
 include 'security'
 include 'service'
-include 'controller'
+include 'rest-app'
 
-rootProject.children.each {
-    it.name = ('app' == it.name ? 'rest-api' : it.name)
-}
+

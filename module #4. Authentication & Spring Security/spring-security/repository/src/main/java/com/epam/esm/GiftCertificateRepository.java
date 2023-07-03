@@ -1,29 +1,37 @@
 package com.epam.esm;
 
 import com.epam.esm.model.entity.GiftCertificate;
-import com.epam.esm.utils.QueryParameters;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Set;
 
 public interface GiftCertificateRepository
-        extends GenericRepository<GiftCertificate, Long> {
+        extends JpaRepository<GiftCertificate, Long> {
 
+    @Query("SELECT DISTINCT gc FROM GiftCertificate gc JOIN gc.tags t" +
+            " WHERE t.name IN (:tags) ORDER BY gc.id")
     List<GiftCertificate> findAllByTags(Set<String> tags, Pageable pageable);
 
     List<GiftCertificate> findAllByName(String name, Pageable pageable);
 
-    List<GiftCertificate> findAllWithParams(QueryParameters queryParams, Pageable pageable);
-
+    @Query("SELECT gc FROM Receipt r JOIN" +
+            " r.giftCertificates gc WHERE r.id = (:receiptID) ORDER BY gc.id")
     List<GiftCertificate> findAllByReceipt(Long receiptID, Pageable pageable);
 
+    @Query("SELECT COUNT(gc.id) FROM Receipt r JOIN" +
+            " r.giftCertificates gc WHERE r.id = (:receiptID)")
     Long getTotalRecordsForReceiptID(Long receiptID);
 
+    @Query( "SELECT COUNT(gc.id) FROM GiftCertificate gc WHERE " +
+            "LOWER(gc.name) LIKE LOWER(:name)")
     Long getTotalRecordsForNameLike(String name);
 
-    Long getTotalRecordsForParams(QueryParameters queryParams);
-
+    @Query( "SELECT COUNT(gc.id) FROM GiftCertificate gc " +
+            "JOIN gc.tags t WHERE t.name IN (:tagNames)")
     Long getTotalRecordsForTagsParam(Set<String> tagNames);
 
+    boolean existsByName(String name);
 }

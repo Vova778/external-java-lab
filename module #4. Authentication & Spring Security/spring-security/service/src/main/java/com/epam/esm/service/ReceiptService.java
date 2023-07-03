@@ -14,5 +14,5 @@ public interface ReceiptService {
 
     Page<ReceiptDTO> findAllByUser(Long userID, Pageable pageable);
 
-    ReceiptDTO deleteById(Long id);
+    void deleteById(Long id);
 }

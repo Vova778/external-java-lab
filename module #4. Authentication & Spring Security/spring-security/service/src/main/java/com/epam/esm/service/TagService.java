@@ -4,6 +4,7 @@ import com.epam.esm.dto.TagDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+
 public interface TagService  {
     TagDTO save(TagDTO tagDTO);
 
@@ -15,7 +16,5 @@ public interface TagService  {
 
     Page<TagDTO> findAllByCertificate(Long certificateID, Pageable pageable);
 
-    TagDTO findMostWidelyUsedTagOfUserWithHighestCostOfAllReceipts();
-
-    TagDTO deleteByID(Long id);
+    void deleteByID(Long id);
 }
