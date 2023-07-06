@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
@@ -29,6 +30,7 @@ import java.util.Properties;
 
 @Slf4j
 @Configuration
+@EnableJpaRepositories("com.epam.esm")
 @EnableTransactionManagement
 public class JPAConfig {
     @Value("${spring.jpa.show-sql}")

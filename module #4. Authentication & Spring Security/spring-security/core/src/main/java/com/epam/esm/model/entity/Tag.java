@@ -21,19 +21,14 @@ public class Tag {
     @Column(unique = true, nullable = false)
     private String name;
 
+    public Tag(String name) {
+        this.name = name;
+    }
+
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @ManyToMany(mappedBy = "tags", fetch = FetchType.EAGER)
     private Set<GiftCertificate> giftCertificates = new HashSet<>();
 
-    public void addCertificate(GiftCertificate giftCertificate) {
-        this.giftCertificates.add(giftCertificate);
-        giftCertificate.getTags().add(this);
-    }
-
-    public void removeCertificate(GiftCertificate giftCertificate) {
-        this.giftCertificates.remove(giftCertificate);
-        giftCertificate.getTags().remove(this);
-    }
 }
 
