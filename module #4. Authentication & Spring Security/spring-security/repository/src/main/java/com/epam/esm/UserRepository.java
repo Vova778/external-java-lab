@@ -13,13 +13,12 @@ public interface UserRepository extends JpaRepository<User,Long> {
     boolean existsByEmail(String email);
     Optional<User> findByEmail(String email);
 
-    @Query("SELECT u FROM User u WHERE LOWER(u.firstName) LIKE LOWER(:name)")
-    List<User> findAllByName(String name, Pageable pageable);
+    List<User> findAllByFirstNameContainingIgnoreCase(String name, Pageable pageable);
 
     @Query("SELECT r.user FROM Receipt r WHERE r.id = :receiptID")
     Optional<User> findByReceipt(Long receiptID);
 
-    Long countByFirstNameLikeIgnoreCase(String name);
+    Long countByFirstNameContainingIgnoreCase(String name);
 
 
 }

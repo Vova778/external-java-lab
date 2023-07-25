@@ -117,7 +117,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public Page<GiftCertificateDTO> findAllByName(String name, Pageable pageable) {
         Validate.notBlank(name);
         List<GiftCertificateDTO> certificates = giftCertificateRepository
-                .findAllByName(name, pageable)
+                .findAllByNameContainingIgnoreCase(name, pageable)
                 .stream()
                 .map(certificateMappingService::mapToDto)
                 .toList();
@@ -130,7 +130,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
         log.debug("[GiftCertificateService.findByName()] GiftCertificates received from database: [{}], for name:[{}]"
                 , certificates, name);
-        Long totalRecords = giftCertificateRepository.getTotalRecordsForNameLike(name);
+        Long totalRecords = giftCertificateRepository.countByNameContainingIgnoreCase(name);
         log.debug("[GiftCertificateService.findByName()] Total records for name:[{}]", totalRecords);
         return new PageImpl<>(certificates, pageable, totalRecords);
     }

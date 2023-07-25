@@ -15,7 +15,8 @@ public interface GiftCertificateRepository
             " WHERE t.name IN (:tags) ORDER BY gc.id")
     List<GiftCertificate> findAllByTags(Set<String> tags, Pageable pageable);
 
-    List<GiftCertificate> findAllByName(String name, Pageable pageable);
+    List<GiftCertificate> findAllByNameContainingIgnoreCase(String name, Pageable pageable);
+
 
     @Query("SELECT gc FROM Receipt r JOIN" +
             " r.giftCertificates gc WHERE r.id = (:receiptID) ORDER BY gc.id")
@@ -25,9 +26,7 @@ public interface GiftCertificateRepository
             " r.giftCertificates gc WHERE r.id = (:receiptID)")
     Long getTotalRecordsForReceiptID(Long receiptID);
 
-    @Query( "SELECT COUNT(gc.id) FROM GiftCertificate gc WHERE " +
-            "LOWER(gc.name) LIKE LOWER(:name)")
-    Long getTotalRecordsForNameLike(String name);
+    Long countByNameContainingIgnoreCase(String name);
 
     @Query( "SELECT COUNT(gc.id) FROM GiftCertificate gc " +
             "JOIN gc.tags t WHERE t.name IN (:tagNames)")

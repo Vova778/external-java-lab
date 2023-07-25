@@ -5,6 +5,8 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: '3.1.0'
     // https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons
     implementation group: 'org.springframework.data', name: 'spring-data-commons', version: '3.1.0'
+// https://mvnrepository.com/artifact/com.zaxxer/HikariCP
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: '5.0.1'
 
     implementation project(':service')
     implementation project(':core')
@@ -12,3 +14,7 @@ dependencies {
     implementation project(':security')
 }
 
+jar {
+    archiveBaseName = 'spring-security'
+    archiveVersion = '0.1.0'
+}
