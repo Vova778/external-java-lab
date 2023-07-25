@@ -93,7 +93,8 @@ class GiftCertificateJPARepositoryIntegrationTest {
         String partOfName = "mi";
         Pageable pageable = PageRequest.of(0, 5);
         //when
-        List<GiftCertificate> actual = giftCertificateRepository.findAllByName(partOfName, pageable);
+        List<GiftCertificate> actual = giftCertificateRepository
+                .findAllByNameContainingIgnoreCase(partOfName, pageable);
         //then
         then(actual.size()).isEqualTo(2);
         then(actual).isEqualTo(getAllForNameLike());
@@ -176,7 +177,7 @@ class GiftCertificateJPARepositoryIntegrationTest {
         Long expectedRecords = 2L;
         String partOfName = "mi";
         //when
-        Long actual = giftCertificateRepository.getTotalRecordsForNameLike(partOfName);
+        Long actual = giftCertificateRepository.countByNameContainingIgnoreCase(partOfName);
         //then
         then(actual).isEqualTo(expectedRecords);
     }

@@ -12,6 +12,7 @@ import java.util.Set;
 @Data
 @Entity
 @Builder
+@Table(name ="receipt")
 public class Receipt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

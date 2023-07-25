@@ -4,11 +4,10 @@ package com.epam.esm.configuration;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManager;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -32,6 +31,7 @@ import java.util.Properties;
 @Configuration
 @EnableJpaRepositories("com.epam.esm")
 @EnableTransactionManagement
+@Data
 public class JPAConfig {
     @Value("${spring.jpa.show-sql}")
     private String showSql;
@@ -80,10 +80,11 @@ public class JPAConfig {
     }
 
     @Bean
-    @Profile("prod")
+    @Profile({"prod", "aws"})
     public DataSource prodDataSource() {
         HikariDataSource dataSource;
         HikariConfig config = new HikariConfig();
+
 
         config.setDriverClassName(driverClassName);
         config.setJdbcUrl(url);
@@ -111,6 +112,7 @@ public class JPAConfig {
 
         return dataSource;
     }
+
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {

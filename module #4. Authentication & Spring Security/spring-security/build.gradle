@@ -1,6 +1,7 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.1.0'
+    id 'application'
+    id 'org.springframework.boot' version '3.1.1'
     id 'io.spring.dependency-management' version '1.1.0'
 }
 
@@ -9,17 +10,20 @@ springBoot {
 }
 
 bootJar {
-    enabled = false
+    mainClass = 'com.epam.esm.StarterApplication'
 }
 
-dependencies {
-    implementation project(':rest-app')
-    runtimeOnly 'com.h2database:h2'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-}
 
 test {
     useJUnitPlatform()
+}
+
+dependencies {
+    implementation project(':core')
+    implementation project(':repository')
+    implementation project(':service')
+    implementation project(':security')
+    implementation project(':rest-app')
 }
 
 allprojects {
@@ -37,7 +41,8 @@ allprojects {
     }
 
     dependencies {
-
+        runtimeOnly 'com.h2database:h2'
+        runtimeOnly 'com.mysql:mysql-connector-j'
         // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '3.1.0'
         // https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa
@@ -61,13 +66,49 @@ allprojects {
         compileOnly {
             extendsFrom annotationProcessor
         }
-        configureEach {
+        all {
             exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        }
+    }
+    tasks.withType(Copy).tap {
+        configureEach {
+            filesMatching(["**/*.properties", "**/*.xml"]) {
+                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            }
+        }
+    }
+
+    sourceSets {
+        main {
+            resources {
+                srcDirs += [
+                        "$rootDir/main"
+                ]
+            }
         }
     }
 
     bootJar {
-        enabled = false
+        archiveBaseName = 'spring-security'
+        archiveVersion = '0.1.0'
+
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        mainClass = 'com.epam.esm.StarterApplication'
+
+        manifest {
+            attributes 'Implementation-Name': 'spring-security',
+                    'Implementation-Version': project.version,
+                    'Start-Class': 'com.epam.esm.StarterApplication'
+        }
+
+        from {
+            configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        }
+    }
+
+
+    springBoot {
+        mainClass = 'com.epam.esm.StarterApplication'
     }
 
     tasks.named('test') {

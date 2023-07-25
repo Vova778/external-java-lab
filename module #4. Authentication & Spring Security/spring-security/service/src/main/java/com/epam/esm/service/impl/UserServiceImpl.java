@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<UserDTO> findAllByName(String name, Pageable pageable) {
         Validate.notBlank(name);
-        List<UserDTO> users = userRepository.findAllByName(name, pageable)
+        List<UserDTO> users = userRepository.findAllByFirstNameContainingIgnoreCase(name, pageable)
                 .stream()
                 .map(mappingService::mapToDto)
                 .toList();
@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
                     name);
             throw new UserNotFoundException(String.format("User not found (name:[%s])", name));
         }
-        Long totalRecords = userRepository.countByFirstNameLikeIgnoreCase(name);
+        Long totalRecords = userRepository.countByFirstNameContainingIgnoreCase(name);
         return new PageImpl<>(users, pageable, totalRecords);
     }
 

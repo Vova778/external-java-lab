@@ -12,6 +12,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Data
 @Entity
+@Table(name = "tag")
 public class Tag {
 
     @Id

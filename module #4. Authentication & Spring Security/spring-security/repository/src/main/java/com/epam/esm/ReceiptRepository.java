@@ -9,7 +9,8 @@ import java.util.List;
 
 public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
 
-    List<Receipt> findAllByUser(Long userID, Pageable pageable);
+    @Query("SELECT r FROM Receipt r WHERE r.user.id = :userId")
+    List<Receipt> findAllByUser(Long userId, Pageable pageable);
 
     @Query("SELECT COUNT(r.id) FROM User u JOIN u.receipts r" +
             " WHERE u.id = (:userID)")

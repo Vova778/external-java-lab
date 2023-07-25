@@ -31,9 +31,9 @@ class UserJPARepositoryIntegrationTest {
     @Test
     void isExists() {
         //given
-        String existedEmail = "rtofftspj@intel.com";
-        String existedFirstName = "Rozella";
-        String existedLastName = "Toffts";
+        String existedEmail = "mbilney4@ucoz.com";
+        String existedFirstName = "Martelle";
+        String existedLastName = "Bilney";
         User existedUser = User.builder()
                 .id(4L)
                 .email(existedEmail)
@@ -123,7 +123,7 @@ class UserJPARepositoryIntegrationTest {
         String partOfName = "Be";
         Pageable pageable = PageRequest.of(0, 5);
         //when
-        List<User> actual = userJPARepository.findAllByName(partOfName, pageable);
+        List<User> actual = userJPARepository.findAllByFirstNameContainingIgnoreCase(partOfName, pageable);
         //then
         then(actual.size()).isEqualTo(4);
         then(actual).isEqualTo(getAllForNameLike());
@@ -164,7 +164,7 @@ class UserJPARepositoryIntegrationTest {
         Long expectedRecords = 4L;
         String partOfName = "Be";
         //when
-        Long actual = userJPARepository.countByFirstNameLikeIgnoreCase(partOfName);
+        Long actual = userJPARepository.countByFirstNameContainingIgnoreCase(partOfName);
         //then
         then(actual).isEqualTo(expectedRecords);
     }
