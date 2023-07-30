@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="StarterSecurityApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-        <module name="security.rest-app.main" />
-        <option name="SPRING_BOOT_MAIN_CLASS" value="com.epam.esm.api.StarterSecurityApplication" />
+    <configuration default="false" name="StarterApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+        <module name="spring-security.rest-app.main" />
+        <option name="SPRING_BOOT_MAIN_CLASS" value="com.epam.esm.StarterApplication" />
         <method v="2">
             <option name="Make" enabled="true" />
         </method>

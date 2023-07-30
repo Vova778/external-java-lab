@@ -153,25 +153,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     }
 
-   /* @Override
-    public Page<GiftCertificateDTO> findAllWithParams(QueryParameters queryParams, Pageable pageable) {
-        if (queryParams == null) {
-            throw new IllegalArgumentException();
-        }
 
-        List<GiftCertificateDTO> certificates = giftCertificateRepository
-                .findAllWithParams(queryParams, pageable)
-                .stream()
-                .map(certificateMappingService::mapToDto)
-                .toList();
-        if (certificates.isEmpty()) {
-            log.error("[GiftCertificateService.findAllWithParams()] GiftCertificates not found");
-            throw new GiftCertificateNotFoundException("GiftCertificate not found)");
-        }
-        Long totalRecords = giftCertificateRepository.getTotalRecordsForParams(queryParams);
-        log.debug("[GiftCertificateService.findAllByParams()] Total records for params:[{}]", totalRecords);
-        return new PageImpl<>(certificates, pageable, totalRecords);
-    }*/
 
     @Override
     public Page<GiftCertificateDTO> findAllByReceipt(Long receiptID, Pageable pageable) {
@@ -279,4 +261,24 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
         log.debug("[GiftCertificateService.deleteById()] GiftCertificate for ID:[{}] removed.", id);
     }
+
+      /* @Override
+    public Page<GiftCertificateDTO> findAllWithParams(QueryParameters queryParams, Pageable pageable) {
+        if (queryParams == null) {
+            throw new IllegalArgumentException();
+        }
+
+        List<GiftCertificateDTO> certificates = giftCertificateRepository
+                .findAllWithParams(queryParams, pageable)
+                .stream()
+                .map(certificateMappingService::mapToDto)
+                .toList();
+        if (certificates.isEmpty()) {
+            log.error("[GiftCertificateService.findAllWithParams()] GiftCertificates not found");
+            throw new GiftCertificateNotFoundException("GiftCertificate not found)");
+        }
+        Long totalRecords = giftCertificateRepository.getTotalRecordsForParams(queryParams);
+        log.debug("[GiftCertificateService.findAllByParams()] Total records for params:[{}]", totalRecords);
+        return new PageImpl<>(certificates, pageable, totalRecords);
+    }*/
 }
