@@ -135,6 +135,21 @@ class TagJPARepositoryIntegrationTest {
     @Sql(scripts = {"/schema-h2.sql", "/data-h2.sql"},
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Test
+    void findMostWidelyUsedTagOfUserWithHighestCostOfAllReceipts() {
+        //given
+        Tag expected = new Tag(4L, "c-sharp", new HashSet<>());
+        Tag tag = null;
+        //when
+        Optional<Tag> result = tagRepository.findMostWidelyUsedTagOfUserWithHighestCostOfAllOrders();
+        if (result.isPresent()) tag = result.get();
+        //then
+        then(tag).isNotNull();
+        then(tag).isEqualTo(expected);
+    }
+
+    @Sql(scripts = {"/schema-h2.sql", "/data-h2.sql"},
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Test
     void getTotalRecordsForGiftCertificateID() {
         //given
         Long certificateID = 3L;

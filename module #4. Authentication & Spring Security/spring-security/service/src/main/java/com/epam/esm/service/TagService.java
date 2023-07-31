@@ -14,6 +14,8 @@ public interface TagService  {
 
     TagDTO findByName(String name);
 
+    TagDTO findMostWidelyUsedTagOfUserWithHighestCostOfAllOrders();
+
     Page<TagDTO> findAllByCertificate(Long certificateID, Pageable pageable);
 
     void deleteByID(Long id);

@@ -117,6 +117,8 @@ class GiftCertificateJPARepositoryIntegrationTest {
         then(giftCertificate.getName()).isEqualTo(expectedTitle);
     }
 
+
+
     @Sql(scripts = {"/schema-h2.sql", "/data-h2.sql"},
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Test

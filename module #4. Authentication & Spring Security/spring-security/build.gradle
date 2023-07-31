@@ -5,25 +5,8 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.0'
 }
 
-springBoot {
-    mainClass = 'com.epam.esm.StarterApplication'
-}
-
-bootJar {
-    mainClass = 'com.epam.esm.StarterApplication'
-}
-
-
 test {
     useJUnitPlatform()
-}
-
-dependencies {
-    implementation project(':core')
-    implementation project(':repository')
-    implementation project(':service')
-    implementation project(':security')
-    implementation project(':rest-app')
 }
 
 allprojects {
@@ -41,18 +24,18 @@ allprojects {
     }
 
     dependencies {
-        runtimeOnly 'com.h2database:h2'
-        runtimeOnly 'com.mysql:mysql-connector-j'
         // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
-        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '3.1.0'
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '3.1.1'
         // https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa
-        implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: '3.1.0'
+        implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: '3.1.1'
         // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-log4j2
-        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-log4j2', version: '3.1.0'
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-log4j2', version: '3.1.1'
         // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
-        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '3.1.0'
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '3.1.1'
         // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
-        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.1.0'
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.1.1'
+        // https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons
+        implementation group: 'org.springframework.data', name: 'spring-data-commons', version: '3.1.1'
 
         // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
         implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
@@ -61,6 +44,7 @@ allprojects {
         annotationProcessor 'org.projectlombok:lombok'
 
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
     }
     configurations {
         compileOnly {
@@ -70,6 +54,17 @@ allprojects {
             exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
         }
     }
+
+    bootJar {
+        mainClass = 'com.epam.esm.StarterApplication'
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+
+
     tasks.withType(Copy).tap {
         configureEach {
             filesMatching(["**/*.properties", "**/*.xml"]) {
@@ -87,31 +82,35 @@ allprojects {
             }
         }
     }
+}
 
-    bootJar {
-        archiveBaseName = 'spring-security'
-        archiveVersion = '0.1.0'
+dependencies {
+    implementation project(':repository')
+    implementation project(':service')
+    implementation project(':security')
+    implementation project(':core')
+    implementation project(':rest-app')
+}
 
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        mainClass = 'com.epam.esm.StarterApplication'
+bootJar {
+    archiveBaseName = 'MJC-spring-app'
+    archiveVersion = '0.1.0'
 
-        manifest {
-            attributes 'Implementation-Name': 'spring-security',
-                    'Implementation-Version': project.version,
-                    'Start-Class': 'com.epam.esm.StarterApplication'
-        }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    mainClass = 'com.epam.esm.StarterApplication'
 
-        from {
-            configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-        }
+    manifest {
+        attributes 'Implementation-Name': 'MJC-spring-app',
+                'Implementation-Version': project.version,
+                'Start-Class': 'com.epam.esm.StarterApplication'
     }
 
-
-    springBoot {
-        mainClass = 'com.epam.esm.StarterApplication'
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
+}
 
-    tasks.named('test') {
-        useJUnitPlatform()
-    }
+
+springBoot {
+    mainClass = 'com.epam.esm.StarterApplication'
 }

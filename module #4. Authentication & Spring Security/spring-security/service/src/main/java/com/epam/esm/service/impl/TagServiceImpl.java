@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -97,6 +96,17 @@ public class TagServiceImpl implements TagService {
 
 
     @Override
+    public TagDTO findMostWidelyUsedTagOfUserWithHighestCostOfAllOrders() {
+        return tagRepository.findMostWidelyUsedTagOfUserWithHighestCostOfAllOrders()
+                .map(mappingService::mapToDto)
+                .orElseThrow(() -> {
+                    log.error("[TagService.findMostWidelyUsedTagOfUserWithHighestCostOfAllOrders()] Tag not found");
+                    throw new TagNotFoundException("Tag not found");
+                });
+    }
+
+
+    @Override
     public Page<TagDTO> findAll(Pageable pageable) {
         List<TagDTO> tags = tagRepository.findAll(pageable)
                 .stream()
@@ -118,10 +128,8 @@ public class TagServiceImpl implements TagService {
             throw new IllegalArgumentException("Tag.id can't be less than zero.");
         }
 
-        Optional<Tag> tag = tagRepository.findById(id);
-
-        log.debug("Delete tag : {}", tag);
-        if (tag.isEmpty() || !tagRepository.existsById(tag.get().getId())) {
+        log.debug("Delete tag given id:[{}] not found.", id);
+        if (!tagRepository.existsById(id)) {
             log.error("[TagService.deleteById()] Tag with given id:[{}] not found.", id);
             throw new TagNotFoundException(String.format("Tag with given id:[%d] not found for delete.", id));
         }

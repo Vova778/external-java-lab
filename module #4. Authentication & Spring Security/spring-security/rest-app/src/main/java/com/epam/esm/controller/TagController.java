@@ -41,6 +41,12 @@ public class TagController {
         TagModel tagModel = tagModelAssembler.toModel(tagDTO);
         return new ResponseEntity<>(tagModel, HttpStatus.OK);
     }
+    @GetMapping("/find-most-widely-used-tag")
+    public ResponseEntity<TagModel> findMostWidelyUsedTagOfUserWithHighestCostOfAllOrders() {
+        TagDTO tagDTO = tagService.findMostWidelyUsedTagOfUserWithHighestCostOfAllOrders();
+        TagModel tagModel = tagModelAssembler.toModel(tagDTO);
+        return new ResponseEntity<>(tagModel, HttpStatus.OK);
+    }
 
     @GetMapping("/find-all")
     public ResponseEntity<PagedModel<TagModel>> findAll(Pageable pageable) {
