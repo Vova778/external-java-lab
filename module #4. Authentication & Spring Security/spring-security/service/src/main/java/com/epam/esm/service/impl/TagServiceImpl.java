@@ -96,6 +96,17 @@ public class TagServiceImpl implements TagService {
 
 
     @Override
+    public TagDTO findMostWidelyUsedTagOfUserWithHighestCostOfAllOrders() {
+        return tagRepository.findMostWidelyUsedTagOfUserWithHighestCostOfAllOrders()
+                .map(mappingService::mapToDto)
+                .orElseThrow(() -> {
+                    log.error("[TagService.findMostWidelyUsedTagOfUserWithHighestCostOfAllOrders()] Tag not found");
+                    throw new TagNotFoundException("Tag not found");
+                });
+    }
+
+
+    @Override
     public Page<TagDTO> findAll(Pageable pageable) {
         List<TagDTO> tags = tagRepository.findAll(pageable)
                 .stream()

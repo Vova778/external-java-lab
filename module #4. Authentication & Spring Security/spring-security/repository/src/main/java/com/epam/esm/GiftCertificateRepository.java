@@ -17,7 +17,6 @@ public interface GiftCertificateRepository
 
     List<GiftCertificate> findAllByNameContainingIgnoreCase(String name, Pageable pageable);
 
-
     @Query("SELECT gc FROM Receipt r JOIN" +
             " r.giftCertificates gc WHERE r.id = (:receiptID) ORDER BY gc.id")
     List<GiftCertificate> findAllByReceipt(Long receiptID, Pageable pageable);

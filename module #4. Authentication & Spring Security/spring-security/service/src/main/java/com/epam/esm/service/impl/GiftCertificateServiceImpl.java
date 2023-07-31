@@ -148,7 +148,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         }
 
         log.debug("[GiftCertificateService.findAll()] GiftCertificates received from database: [{}]", certificates);
-        Long totalRecords = giftCertificateRepository.count();
+        long totalRecords = giftCertificateRepository.count();
         return new PageImpl<>(certificates, pageable, totalRecords);
 
     }
@@ -182,7 +182,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public GiftCertificateDTO update(GiftCertificateDTO giftCertificateDTO) {
         Validate.notNull(giftCertificateDTO, "GiftCertificateDTO can't be Null");
 
-        if (giftCertificateDTO.getId() < 1 || giftCertificateDTO.getId() == null) {
+        if (giftCertificateDTO.getId() < 1) {
             log.error("[GiftCertificateService.update()] An exception occurs: given ID:[{}]" +
                     " can't be less than zero or null", giftCertificateDTO.getId());
             throw new IllegalArgumentException("Given ID can't be less than zero or null");
@@ -262,23 +262,4 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         log.debug("[GiftCertificateService.deleteById()] GiftCertificate for ID:[{}] removed.", id);
     }
 
-      /* @Override
-    public Page<GiftCertificateDTO> findAllWithParams(QueryParameters queryParams, Pageable pageable) {
-        if (queryParams == null) {
-            throw new IllegalArgumentException();
-        }
-
-        List<GiftCertificateDTO> certificates = giftCertificateRepository
-                .findAllWithParams(queryParams, pageable)
-                .stream()
-                .map(certificateMappingService::mapToDto)
-                .toList();
-        if (certificates.isEmpty()) {
-            log.error("[GiftCertificateService.findAllWithParams()] GiftCertificates not found");
-            throw new GiftCertificateNotFoundException("GiftCertificate not found)");
-        }
-        Long totalRecords = giftCertificateRepository.getTotalRecordsForParams(queryParams);
-        log.debug("[GiftCertificateService.findAllByParams()] Total records for params:[{}]", totalRecords);
-        return new PageImpl<>(certificates, pageable, totalRecords);
-    }*/
 }
