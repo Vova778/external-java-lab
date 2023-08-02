@@ -1,0 +1,116 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.springframework.boot' version '3.1.1'
+    id 'io.spring.dependency-management' version '1.1.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    group = 'com.epam.esm'
+    version = '1.0'
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '3.1.1'
+        // https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa
+        implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: '3.1.1'
+        // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-log4j2
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-log4j2', version: '3.1.1'
+        // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '3.1.1'
+        // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.1.1'
+        // https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons
+        implementation group: 'org.springframework.data', name: 'spring-data-commons', version: '3.1.1'
+
+        // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+        implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    }
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+        all {
+            exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        }
+    }
+
+    bootJar {
+        mainClass = 'com.epam.esm.StarterApplication'
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+
+
+    tasks.withType(Copy).tap {
+        configureEach {
+            filesMatching(["**/*.properties", "**/*.xml"]) {
+                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            }
+        }
+    }
+
+    sourceSets {
+        main {
+            resources {
+                srcDirs += [
+                        "$rootDir/main"
+                ]
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation project(':repository')
+    implementation project(':service')
+    implementation project(':security')
+    implementation project(':core')
+    implementation project(':rest-app')
+}
+
+bootJar {
+    archiveBaseName = 'MJC-spring-app'
+    archiveVersion = '0.1.0'
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    mainClass = 'com.epam.esm.StarterApplication'
+
+    manifest {
+        attributes 'Implementation-Name': 'MJC-spring-app',
+                'Implementation-Version': project.version,
+                'Start-Class': 'com.epam.esm.StarterApplication'
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+
+springBoot {
+    mainClass = 'com.epam.esm.StarterApplication'
+}
