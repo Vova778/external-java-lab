@@ -64,6 +64,8 @@ allprojects {
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '3.1.1'
         // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.1.1'
+        // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-tomcat
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: '3.1.1'
         // https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons
         implementation group: 'org.springframework.data', name: 'spring-data-commons', version: '3.1.1'
 
