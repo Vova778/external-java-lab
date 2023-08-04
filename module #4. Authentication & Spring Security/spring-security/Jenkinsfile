@@ -1,0 +1,30 @@
+  pipeline {
+        agent any
+
+        stages {
+            stage('Build') {
+                steps {
+                    git 'https://github.com/Vova778/external-java-lab.git'
+                    sh './gradlew clean compileJava'
+                }
+            }
+            stage('Test') {
+                steps {
+                    sh './gradlew test'
+                }
+            }
+            stage('SonarQube Analysis') {
+                steps {
+                    withSonarQubeEnv(installationName:'sonar') {
+                        sh "./gradlew sonarqube"
+                    }
+                    jacoco(
+                            execPattern:'service/src/test/resources/*.exec',
+                            classPattern:'service/src/test/resources/classes',
+                            sourcePattern:'web/src/main/java/com/epam/esm/config',
+                            exclusionPattern:'service/src/test*'
+                    )
+                }
+            }
+        }
+    }
