@@ -6,15 +6,6 @@ plugins {
     id 'org.sonarqube' version "4.3.0.3225"
 }
 
-sonarqube {
-    properties {
-        property "sonar.projectKey", "MJC-master"
-        property "sonar.login", "squ_e4f39c53eac0eaa840a6f15c71ebc08bfb43597d"
-        property "sonar.host.url", "http://localhost:9000"
-
-    }
-}
-
 subprojects {
     buildscript {
         repositories {
@@ -54,18 +45,18 @@ allprojects {
     }
 
     dependencies {
+        // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-tomcat
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: '3.1.1'
+        // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '3.1.1'
         // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '3.1.1'
-        // https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa
-        implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: '3.1.1'
         // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-log4j2
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-log4j2', version: '3.1.1'
         // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '3.1.1'
         // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.1.1'
-        // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-tomcat
-        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: '3.1.1'
         // https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons
         implementation group: 'org.springframework.data', name: 'spring-data-commons', version: '3.1.1'
 
@@ -76,16 +67,17 @@ allprojects {
         annotationProcessor 'org.projectlombok:lombok'
 
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
     }
+
     configurations {
         compileOnly {
             extendsFrom annotationProcessor
         }
-        all {
+        configureEach {
             exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
         }
     }
+
     test {
         useJUnitPlatform()
         jacoco {
@@ -120,10 +112,12 @@ allprojects {
     check.dependsOn jacocoTestCoverageVerification
     jacocoTestCoverageVerification.dependsOn jacocoTestReport
 
+
     bootJar {
+        enabled = false
         mainClass = 'com.epam.esm.StarterApplication'
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
+
     bootWar {
         mainClass = 'com.epam.esm.StarterApplication'
     }
@@ -131,35 +125,15 @@ allprojects {
     war {
         archiveFileName = "${project.name}.war"
     }
-
 }
 
 dependencies {
-    implementation project(':repository')
     implementation project(':service')
-    implementation project(':security')
     implementation project(':core')
+    implementation project(':repository')
+    implementation project(':security')
     implementation project(':rest-app')
 }
-
-bootJar {
-    archiveBaseName = 'MJC-spring-app'
-    archiveVersion = '0.1.0'
-
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    mainClass = 'com.epam.esm.StarterApplication'
-
-    manifest {
-        attributes 'Implementation-Name': 'MJC-spring-app',
-                'Implementation-Version': project.version,
-                'Start-Class': 'com.epam.esm.StarterApplication'
-    }
-
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}
-
 
 springBoot {
     mainClass = 'com.epam.esm.StarterApplication'
