@@ -22,7 +22,7 @@ public class AuthController {
 
     @GetMapping("/hello")
     public String sayHello() {
-        return "Тест";
+        return "Привіт";
     }
 
     @PostMapping("/sign-up")
