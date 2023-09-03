@@ -1,6 +1,7 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.GiftCertificateDTO;
+import com.epam.esm.utils.QueryParameters;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,6 +15,8 @@ public interface GiftCertificateService {
     Page<GiftCertificateDTO> findAll(Pageable pageable);
 
     Page<GiftCertificateDTO> findAllByTags(Set<String> tags, Pageable pageable);
+
+    Page<GiftCertificateDTO> findAllWithParams(Pageable pageable, QueryParameters queryParameters);
 
     Page<GiftCertificateDTO> findAllByName(String name, Pageable pageable);
 

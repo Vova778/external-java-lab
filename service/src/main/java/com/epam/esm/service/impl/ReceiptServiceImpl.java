@@ -11,7 +11,7 @@ import com.epam.esm.payload.request.ReceiptRequestBody;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.ReceiptService;
 import com.epam.esm.service.UserService;
-import com.epam.esm.service.mapping.MappingService;
+import com.epam.esm.service.mapping.impl.ReceiptMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
@@ -32,7 +32,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ReceiptServiceImpl implements ReceiptService {
     private final ReceiptRepository receiptRepository;
-    private final MappingService<Receipt, ReceiptDTO> mappingService;
+    private final ReceiptMapper receiptMapper;
     private final UserService userService;
     private final GiftCertificateService giftCertificateService;
 
@@ -44,13 +44,13 @@ public class ReceiptServiceImpl implements ReceiptService {
         receiptDTO.setUserDTO(userDTO);
         setGiftCertificatesAndPrice(receiptDTO, receiptRequestBody);
 
-        Receipt forSave = mappingService.mapFromDto(receiptDTO);
+        Receipt forSave = receiptMapper.mapFromDto(receiptDTO);
         LocalDateTime creationTime = LocalDateTime.now(ZoneOffset.UTC);
         forSave.setCreateDate(creationTime);
 
         Receipt savedReceipt = receiptRepository.save(forSave);
         log.debug("[ReceiptService.save()] Receipt saved: [{}]", savedReceipt);
-        return mappingService.mapToDto(savedReceipt);
+        return receiptMapper.mapToDto(savedReceipt);
     }
 
     private void setGiftCertificatesAndPrice(ReceiptDTO receiptDTO, ReceiptRequestBody receiptRequestBody) {
@@ -90,10 +90,10 @@ public class ReceiptServiceImpl implements ReceiptService {
         }
 
         ReceiptDTO receiptDTO = receiptRepository.findById(id)
-                .map(mappingService::mapToDto)
+                .map(receiptMapper::mapToDto)
                 .orElseThrow(() -> {
                     log.error("[Receipt.findById()] Receipt for given ID:[{}] not found", id);
-                    throw new ReceiptNotFoundException(String.format("Receipt not found (id:[%d])", id));
+                    return new ReceiptNotFoundException(String.format("Receipt not found (id:[%d])", id));
                 });
 
         log.debug("[ReceiptService.findById()] Receipt received from database: [{}], for ID:[{}]", receiptDTO, id);
@@ -106,14 +106,14 @@ public class ReceiptServiceImpl implements ReceiptService {
         List<ReceiptDTO> receiptDTOS = receiptRepository
                 .findAll(pageable)
                 .stream()
-                .map(mappingService::mapToDto)
+                .map(receiptMapper::mapToDto)
                 .toList();
         if (receiptDTOS.isEmpty()) {
             log.error("[ReceiptService.findAll()] Receipts not found");
             throw new ReceiptNotFoundException("Receipts not found");
         }
         log.debug("[ReceiptService.findAll()] Receipts received from database: [{}]", receiptDTOS);
-        Long totalRecords = receiptRepository.count();
+        long totalRecords = receiptRepository.count();
         return new PageImpl<>(receiptDTOS, pageable, totalRecords);
     }
 
@@ -127,7 +127,7 @@ public class ReceiptServiceImpl implements ReceiptService {
         List<ReceiptDTO> receipts = receiptRepository
                 .findAllByUser(userID, pageable)
                 .stream()
-                .map(mappingService::mapToDto)
+                .map(receiptMapper::mapToDto)
                 .toList();
         if (receipts.isEmpty()) {
             log.error("[ReceiptService.findAllByUser()] Receipts not found");

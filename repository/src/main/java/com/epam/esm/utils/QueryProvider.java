@@ -1,6 +1,5 @@
 package com.epam.esm.utils;
 
-import com.epam.esm.model.entity.GiftCertificate;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -18,10 +17,8 @@ import org.springframework.stereotype.Component;
 @Setter
 public class QueryProvider {
     private QueryParameters queryParams;
-    private static final String QUERY_PROVIDER = "[QueryProvider]";
     private static final String SELECT = "SELECT ";
     private static final String DISTINCT = " DISTINCT ";
-    private static final String COUNT = "COUNT (*) ";
     private static final String DESC = " DESC";
     private static final String WHERE = " WHERE ";
     private static final String AND = " AND ";
@@ -42,14 +39,6 @@ public class QueryProvider {
             " gift_certificate.id = external_lab.gift_certificate_has_tag.gift_certificate_id";
     private static final String JOIN_TAG = " LEFT JOIN external_lab.tag on tag.id = external_lab.gift_certificate_has_tag.tag_id";
 
-    /**
-     * This method implements functionality of constructing
-     * database query based on {@link QueryParameters} fields values.
-     * Result query will use to search and sort {@link GiftCertificate} objects
-     * with search by received parameters option.
-     *
-     * @return ready to use database query
-     */
     public String findAllWithParams() {
         StringBuilder sb = new StringBuilder().append(SELECT).append(DISTINCT).append(CERTIFICATE_FIELDS)
                 .append(FROM_GIFT_CERTIFICATE);
@@ -64,14 +53,6 @@ public class QueryProvider {
         return sb.toString();
     }
 
-    /**
-     * This method implements functionality of adding necessary
-     * search operations to database query. Depends on values of {@link QueryParameters#getTagName()}
-     * , {@link QueryParameters#getName()} ()} and {@link QueryParameters#getDescription()}
-     * parameters received from GiftCertificateController
-     *
-     * @param sb constructed query from {@link #findAllWithParams()}  method.
-     */
     private void getQueryDependsOnParams(StringBuilder sb, String statement) {
         if ((queryParams.getName() != null && !queryParams.getName().isEmpty())
                 && (queryParams.getDescription() != null && !queryParams.getDescription().isEmpty())) {
@@ -80,14 +61,12 @@ public class QueryProvider {
                     .append(AND).append(DESCRIPTION).append(LIKE).append(FRONT_PERCENT_SIGN)
                     .append(queryParams.getDescription()).append(BACK_PERCENT_SIGN);
             getSortedByParam(sb);
-        } else if ((queryParams.getName() != null && !queryParams.getName().isEmpty())
-                && (queryParams.getDescription() == null || queryParams.getDescription().isEmpty())) {
+        } else if (queryParams.getName() != null && !queryParams.getName().isEmpty()) {
             sb.append(statement).append(CERTIFICATE_NAME).append(LIKE).append(FRONT_PERCENT_SIGN)
                     .append(queryParams.getName())
                     .append(BACK_PERCENT_SIGN);
             getSortedByParam(sb);
-        } else if ((queryParams.getDescription() != null && !queryParams.getDescription().isEmpty())
-                && (queryParams.getName() == null || queryParams.getName().isEmpty())) {
+        } else if (queryParams.getDescription() != null && !queryParams.getDescription().isEmpty()) {
             sb.append(statement).append(DESCRIPTION).append(LIKE).append(FRONT_PERCENT_SIGN)
                     .append(queryParams.getDescription()).append(BACK_PERCENT_SIGN);
             getSortedByParam(sb);
@@ -96,13 +75,6 @@ public class QueryProvider {
         }
     }
 
-    /**
-     * This method implements functionality of adding necessary
-     * sorting operations to database query. Depends on values of {@link QueryParameters#getSortByDate()}
-     * and {@link QueryParameters#getSortByName()} parameters received from GiftCertificateController
-     *
-     * @param sb constructed query from {@link #getQueryDependsOnParams(StringBuilder sb, String statement)} method.
-     */
     private void getSortedByParam(StringBuilder sb) {
         if ((queryParams.getSortByName() != null && !queryParams.getSortByName().isEmpty())
                 && (queryParams.getSortByDate() == null || queryParams.getSortByDate().isEmpty())) {
@@ -117,37 +89,4 @@ public class QueryProvider {
         }
     }
 
-    public String getTotalRecordsForParams() {
-        StringBuilder sb = new StringBuilder().append(SELECT).append(COUNT)
-                .append(FROM_GIFT_CERTIFICATE);
-        if (queryParams.getTagName() != null && !queryParams.getTagName().isEmpty()) {
-            sb.append(JOIN_TAG_HAS_CERTIFICATE).append(JOIN_TAG).append(WHERE).append(TAG_NAME)
-                    .append(LIKE).append(FRONT_PERCENT_SIGN).append(queryParams.getTagName()).append(BACK_PERCENT_SIGN);
-            getQueryDependsOnParamsForCount(sb, AND);
-        } else {
-            getQueryDependsOnParamsForCount(sb, WHERE);
-        }
-        log.warn("QUERY: {}", sb);
-        return sb.toString();
-    }
-
-    private void getQueryDependsOnParamsForCount(StringBuilder sb, String statement) {
-        if ((queryParams.getName() != null && !queryParams.getName().isEmpty())
-                && (queryParams.getDescription() != null && !queryParams.getDescription().isEmpty())) {
-            sb.append(statement).append(CERTIFICATE_NAME).append(LIKE).append(FRONT_PERCENT_SIGN)
-                    .append(queryParams.getName()).append(BACK_PERCENT_SIGN)
-                    .append(AND).append(DESCRIPTION).append(LIKE).append(FRONT_PERCENT_SIGN)
-                    .append(queryParams.getDescription()).append(BACK_PERCENT_SIGN);
-        } else if ((queryParams.getName() != null && !queryParams.getName().isEmpty())
-                && (queryParams.getDescription() == null || queryParams.getDescription().isEmpty())) {
-            sb.append(statement).append(CERTIFICATE_NAME).append(LIKE).append(FRONT_PERCENT_SIGN)
-                    .append(queryParams.getName())
-                    .append(BACK_PERCENT_SIGN);
-            getSortedByParam(sb);
-        } else if ((queryParams.getDescription() != null && !queryParams.getDescription().isEmpty())
-                && (queryParams.getName() == null || queryParams.getName().isEmpty())) {
-            sb.append(statement).append(DESCRIPTION).append(LIKE).append(FRONT_PERCENT_SIGN)
-                    .append(queryParams.getDescription()).append(BACK_PERCENT_SIGN);
-        }
-    }
 }

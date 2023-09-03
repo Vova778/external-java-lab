@@ -6,7 +6,7 @@ import com.epam.esm.exception.model.UserAlreadyExistsException;
 import com.epam.esm.exception.model.UserNotFoundException;
 import com.epam.esm.model.entity.User;
 import com.epam.esm.service.UserService;
-import com.epam.esm.service.mapping.MappingService;
+import com.epam.esm.service.mapping.impl.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final MappingService<User, UserDTO> mappingService;
+    private final UserMapper userMapper;
 
     @Override
     public UserDTO save(UserDTO userDTO) {
@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("An exception occurs: UserDTO can't be null");
         }
 
-        User user = mappingService.mapFromDto(userDTO);
+        User user = userMapper.mapFromDto(userDTO);
 
         if (userRepository.existsByEmail(user.getEmail())) {
             log.error("[UserService.save()] User with given email:[{}] already exists.", userDTO.getEmail());
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
                     .format("User with given email:[%s] already exists.", userDTO.getEmail()));
         }
         User savedUser = userRepository.save(user);
-        return mappingService.mapToDto(savedUser);
+        return userMapper.mapToDto(savedUser);
     }
 
     @Override
@@ -50,10 +50,10 @@ public class UserServiceImpl implements UserService {
         }
 
         UserDTO userDTO = userRepository.findById(id)
-                .map(mappingService::mapToDto)
+                .map(userMapper::mapToDto)
                 .orElseThrow(() -> {
                     log.error("[UserService.findById()] User for given ID:[{}] not found", id);
-                    throw new UserNotFoundException(String.format("User not found (id:[%d])", id));
+                    return new UserNotFoundException(String.format("User not found (id:[%d])", id));
                 });
 
         log.debug("[UserService.findById()] User received from database: [{}], for ID:[{}]", userDTO, id);
@@ -61,11 +61,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDTO findByEmail(String email) {
+        if (email.isEmpty() || email.isBlank()) {
+            log.error("[UserService.findByEmail()] An exception occurs: email:[{}] can't be empty or null", email);
+            throw new IllegalArgumentException("An exception occurs: Tag.id can't be less than zero or null");
+        }
+
+        if(!userRepository.existsByEmail(email)) {
+            log.error("[UserService.existsByEmail()] An exception occurs: user with email:[{}] doesn't exist", email);
+            throw new UserNotFoundException( String.format("User with (email:[%s]) doesn't exist", email));
+        }
+        return userMapper.mapToDto(userRepository.findByEmail(email).get());
+    }
+
+    @Override
     public Page<UserDTO> findAllByName(String name, Pageable pageable) {
         Validate.notBlank(name);
         List<UserDTO> users = userRepository.findAllByFirstNameContainingIgnoreCase(name, pageable)
                 .stream()
-                .map(mappingService::mapToDto)
+                .map(userMapper::mapToDto)
                 .toList();
 
         if (users.isEmpty()) {
@@ -85,10 +99,10 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("An exception occurs: Receipt.ID can't be less than zero or null");
         }
         UserDTO userDTO = userRepository.findByReceipt(receiptID)
-                .map(mappingService::mapToDto)
+                .map(userMapper::mapToDto)
                 .orElseThrow(() -> {
                     log.error("[UserService.findByReceipt()] User for given Receipt.ID:[{}] not found", receiptID);
-                    throw new UserNotFoundException(String.format("User not found (Receipt.ID:[%d])", receiptID));
+                    return new UserNotFoundException(String.format("User not found (Receipt.ID:[%d])", receiptID));
                 });
 
         log.debug("[UserService.findByReceipt()] User received from database: [{}], for Receipt.ID:[{}]", userDTO,
@@ -100,14 +114,14 @@ public class UserServiceImpl implements UserService {
     public Page<UserDTO> findAll(Pageable pageable) {
         List<UserDTO> users = userRepository.findAll(pageable)
                 .stream()
-                .map(mappingService::mapToDto)
+                .map(userMapper::mapToDto)
                 .toList();
         if (users.isEmpty()) {
             log.error("[UserService.findAll()] Users not found");
             throw new UserNotFoundException("Users not found");
         }
         log.debug("[UserService.findAll()] Users received from database: [{}]", users);
-        Long totalRecords = userRepository.count();
+        long totalRecords = userRepository.count();
         return new PageImpl<>(users, pageable, totalRecords);
     }
 }

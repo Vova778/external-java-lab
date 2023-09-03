@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ReceiptMappingServiceImpl implements MappingService<Receipt, ReceiptDTO> {
+public class ReceiptMapper implements MappingService<Receipt, ReceiptDTO> {
     private final MappingService<GiftCertificate, GiftCertificateDTO> certificateMappingService;
     private final MappingService<User, UserDTO> userMappingService;
 
@@ -30,22 +30,15 @@ public class ReceiptMappingServiceImpl implements MappingService<Receipt, Receip
         if (receiptDTO.getUserDTO() != null) {
             model.setUser(userMappingService.mapFromDto(receiptDTO.getUserDTO()));
         }
-        log.debug("[ReceiptMappingService] ReceiptDTO converted to Receipt model: [{}]", model);
+        log.debug("[ReceiptMappingService] ReceiptDTO: [{}] converted to Receipt model: [{}]", receiptDTO, model);
         return model;
     }
 
     @Override
     public ReceiptDTO mapToDto(Receipt model) {
         ReceiptDTO receiptDTO = new ReceiptDTO();
-        BeanUtils.copyProperties(model, receiptDTO);
-        if (model.getGiftCertificates() != null && !model.getGiftCertificates().isEmpty()) {
-            model.getGiftCertificates().forEach(giftCertificate ->
-                    receiptDTO.getGiftCertificates().add(certificateMappingService.mapToDto(giftCertificate)));
-        }
-        if (model.getUser() != null) {
-            receiptDTO.setUserDTO(userMappingService.mapToDto(model.getUser()));
-        }
-        log.debug("[ReceiptMappingService] Receipt model converted to ReceiptDTO: [{}]", receiptDTO);
+        BeanUtils.copyProperties(model, receiptDTO, "giftCertificates", "user");
+        log.debug("[ReceiptMappingService] Receipt model:[{}] converted to ReceiptDTO: [{}]", model, receiptDTO);
         return receiptDTO;
     }
 }

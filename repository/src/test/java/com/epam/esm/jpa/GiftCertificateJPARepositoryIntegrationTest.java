@@ -144,8 +144,6 @@ class GiftCertificateJPARepositoryIntegrationTest {
         then(defaultList.size()).isEqualTo(4);
     }
 
-
-
     @Sql(scripts = {"/schema-h2.sql", "/data-h2.sql"},
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Test

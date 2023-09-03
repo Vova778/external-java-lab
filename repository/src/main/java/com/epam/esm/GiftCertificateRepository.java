@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Set;
 
 public interface GiftCertificateRepository
-        extends JpaRepository<GiftCertificate, Long> {
+        extends JpaRepository<GiftCertificate, Long>, GiftCertificateFilterRepository  {
+
 
     @Query("SELECT DISTINCT gc FROM GiftCertificate gc JOIN gc.tags t" +
             " WHERE t.name IN (:tags) ORDER BY gc.id")

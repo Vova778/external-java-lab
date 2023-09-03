@@ -8,6 +8,7 @@ import com.epam.esm.modal.GiftCertificateModel;
 import com.epam.esm.modal.TagModel;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.TagService;
+import com.epam.esm.utils.QueryParameters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -73,6 +74,27 @@ public class GiftCertificateController {
         return new ResponseEntity<>(pagedModel, HttpStatus.OK);
     }
 
+    @GetMapping("/find-all-with-params")
+    public ResponseEntity<PagedModel<GiftCertificateModel>> findAllWithParams(
+            @RequestParam(required = false) String tagName,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String sortByName,
+            @RequestParam(required = false) String sortByDate,
+            Pageable pageable) {
+
+        QueryParameters queryParams = QueryParameters.builder()
+                .tagName(tagName)
+                .name(name)
+                .description(description)
+                .sortByName(sortByName)
+                .sortByDate(sortByDate)
+                .build();
+        Page<GiftCertificateDTO> certificatePage = giftCertificateService.findAllWithParams(pageable, queryParams);
+        PagedModel<GiftCertificateModel> pagedModel = certificatePagedResourcesAssembler
+                .toModel(certificatePage, giftCertificateModelAssembler);
+        return new ResponseEntity<>(pagedModel, HttpStatus.OK);
+    }
 
     @GetMapping("/find/{certificateID}/tags")
     public ResponseEntity<PagedModel<TagModel>> findTagsByCertificate(@PathVariable Long certificateID,

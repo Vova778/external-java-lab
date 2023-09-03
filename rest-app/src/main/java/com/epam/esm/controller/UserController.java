@@ -28,9 +28,16 @@ public class UserController {
     private final PagedResourcesAssembler<UserDTO> userPagedResourcesAssembler;
     private final PagedResourcesAssembler<ReceiptDTO> receiptPagedResourcesAssembler;
 
-    @GetMapping("/find/{id}")
+    @GetMapping("/findById/{id}")
     public ResponseEntity<UserModel> findByID(@PathVariable Long id) {
         UserDTO userDTO = userService.findById(id);
+        UserModel userModel = userModelAssembler.toModel(userDTO);
+        return new ResponseEntity<>(userModel, HttpStatus.OK);
+    }
+
+    @GetMapping("/findByEmail/{email}")
+    public ResponseEntity<UserModel> findByEmail(@PathVariable String email) {
+        UserDTO userDTO = userService.findByEmail(email);
         UserModel userModel = userModelAssembler.toModel(userDTO);
         return new ResponseEntity<>(userModel, HttpStatus.OK);
     }
