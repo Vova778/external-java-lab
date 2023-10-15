@@ -31,7 +31,7 @@ public class Tag {
 
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @ManyToMany(mappedBy = "tags")
+    @ManyToMany(mappedBy = "tags", fetch = FetchType.EAGER)
     @NotAudited
     private Set<GiftCertificate> giftCertificates = new HashSet<>();
 }

@@ -8,7 +8,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -20,23 +19,15 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateFilterRepos
     private final EntityManager entityManager;
 
     @Override
-    public List<GiftCertificate> findAllWithParams(Pageable pageable, QueryParameters queryParams) {
-        int firstResult = getFirstResultValue(pageable);
+    public List<GiftCertificate> findAllWithParams( QueryParameters queryParams) {
 
         queryProvider.setQueryParams(queryParams);
         return entityManager
-                .createNativeQuery(queryProvider.findAllWithParams(), GiftCertificate.class)
-                .setFirstResult(firstResult)
-                .setMaxResults(pageable.getPageSize())
+                .createNativeQuery(queryProvider.findAllWithParams(),
+                        GiftCertificate.class)
                 .getResultList();
     }
 
-    private static int getFirstResultValue(Pageable pageable) {
-        if (pageable == null) {
-            log.error("[PageableValidator.getFirstResultValue()] Pageable can not be null");
-            throw new IllegalArgumentException("[PageableValidator.getFirstResultValue()] Pageable can not be null");
-        }
-        return pageable.getPageNumber() * pageable.getPageSize();
-    }
+
 
 }

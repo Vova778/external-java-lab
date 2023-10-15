@@ -116,13 +116,26 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public Page<GiftCertificateDTO> findAllWithParams(Pageable pageable, QueryParameters queryParameters) {
-        List<GiftCertificate> filteredGiftCertificates = giftCertificateRepository.findAllWithParams(pageable, queryParameters);
-        List<GiftCertificateDTO> giftCertificateDtoList = filteredGiftCertificates
-                .stream().map(giftCertificateMapper::mapToDto)
-                .toList();
-        return new PageImpl<>(giftCertificateDtoList, pageable, giftCertificateRepository.count());
-    }
+        int firstResult = getFirstResultValue(pageable);
+        List<GiftCertificate> filteredGiftCertificates =
+                giftCertificateRepository.findAllWithParams(queryParameters);
+        int totalElements = filteredGiftCertificates.size();
 
+        List<GiftCertificateDTO> giftCertificateDtoList = filteredGiftCertificates.stream()
+                .skip(firstResult)
+                .limit(pageable.getPageSize())
+                .map(giftCertificateMapper::mapToDto)
+                .toList();
+
+        return new PageImpl<>(giftCertificateDtoList, pageable, totalElements);
+    }
+    private static int getFirstResultValue(Pageable pageable) {
+        if (pageable == null) {
+            log.error("[PageableValidator.getFirstResultValue()] Pageable can not be null");
+            throw new IllegalArgumentException("[PageableValidator.getFirstResultValue()] Pageable can not be null");
+        }
+        return pageable.getPageNumber() * pageable.getPageSize();
+    }
     @Override
     public Page<GiftCertificateDTO> findAllByName(String name, Pageable pageable) {
         Validate.notBlank(name);

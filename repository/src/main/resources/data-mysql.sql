@@ -11027,7 +11027,7 @@ INSERT INTO tag(id, name) VALUES
 -- ������� ������ � ������� users
 --
 INSERT INTO users(id, email, first_name, last_name, password, user_role) VALUES
-(1, 'Banks@nowhere.com', 'Antoine', 'Draper', '8rui1J2NwbB3f1aWm7Wxsw==', 'CUSTOMER'),
+(1, 'ebutchard0@ox.ac.uk', 'Eyde', 'Butchard', '$2a$10$CJSDqMFXSIpJ48bvn6h44.qnk/FsUl2IYBsuiwtdzdAvJCbJhERaW', 'ADMIN'),
 (2, 'Pride1@example.com', 'Edythe', 'Schaeffer', 'DuPGa9nCVFWdjV2sQHXsGQ==', 'ADMIN'),
 (3, 'Golden6@example.com', 'Albert', 'Alicea', 'Rnz5xeB8m7/jjbh6662Q/A==', 'ADMIN'),
 (4, 'Corbett41@example.com', 'Lanette', 'Nowak', 'ICs0zpVdh7gMNW+WSJ2vQA==', 'ADMIN'),

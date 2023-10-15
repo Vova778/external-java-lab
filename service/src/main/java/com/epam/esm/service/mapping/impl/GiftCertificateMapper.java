@@ -31,8 +31,10 @@ public class GiftCertificateMapper implements MappingService<GiftCertificate, Gi
     @Override
     public GiftCertificateDTO mapToDto(GiftCertificate model) {
         GiftCertificateDTO giftCertificateDTO = new GiftCertificateDTO();
-        BeanUtils.copyProperties(model, giftCertificateDTO, "tags", "tokens");
-
+        BeanUtils.copyProperties(model, giftCertificateDTO, "tokens");
+        if (model.getTags() != null && !model.getTags().isEmpty()) {
+            model.getTags().forEach(tagDTO -> giftCertificateDTO.getTags().add(tagMappingService.mapToDto(tagDTO)));
+        }
         log.debug("[GiftCertificateMappingService.mapToDTO()] GiftCertificate model: [{}] converted to DTO: [{}]",
                 model, giftCertificateDTO);
         return giftCertificateDTO;
