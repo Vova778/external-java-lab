@@ -8,6 +8,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -18,16 +19,36 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateFilterRepos
     @PersistenceContext
     private final EntityManager entityManager;
 
+
     @Override
-    public List<GiftCertificate> findAllWithParams( QueryParameters queryParams) {
+    public List<GiftCertificate> findAllWithParams(Pageable pageable, QueryParameters queryParams) {
+        int firstResult = getFirstResultValue(pageable);
 
         queryProvider.setQueryParams(queryParams);
         return entityManager
-                .createNativeQuery(queryProvider.findAllWithParams(),
-                        GiftCertificate.class)
+                .createNativeQuery(queryProvider.findAllWithParams(), GiftCertificate.class)
+                .setFirstResult(firstResult)
+                .setMaxResults(pageable.getPageSize())
                 .getResultList();
     }
 
+    @Override
+    public Long countAllWithParams(QueryParameters queryParams) {
+        queryProvider.setQueryParams(queryParams);
+
+        return (long) entityManager
+                .createNativeQuery(queryProvider.findAllWithParams())
+                .getResultList().size();
+
+    }
+
+    private static int getFirstResultValue(Pageable pageable) {
+        if (pageable == null) {
+            log.error("[PageableValidator.getFirstResultValue()] Pageable can not be null");
+            throw new IllegalArgumentException("[PageableValidator.getFirstResultValue()] Pageable can not be null");
+        }
+        return pageable.getPageNumber() * pageable.getPageSize();
+    }
 
 
 }

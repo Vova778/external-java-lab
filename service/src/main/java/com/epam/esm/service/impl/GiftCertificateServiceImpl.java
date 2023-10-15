@@ -116,14 +116,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public Page<GiftCertificateDTO> findAllWithParams(Pageable pageable, QueryParameters queryParameters) {
-        int firstResult = getFirstResultValue(pageable);
         List<GiftCertificate> filteredGiftCertificates =
-                giftCertificateRepository.findAllWithParams(queryParameters);
-        int totalElements = filteredGiftCertificates.size();
+                giftCertificateRepository.findAllWithParams(pageable,queryParameters);
+        Long totalElements = giftCertificateRepository.countAllWithParams(queryParameters);
 
-        List<GiftCertificateDTO> giftCertificateDtoList = filteredGiftCertificates.stream()
-                .skip(firstResult)
-                .limit(pageable.getPageSize())
+        List<GiftCertificateDTO> giftCertificateDtoList = filteredGiftCertificates
+                .stream()
                 .map(giftCertificateMapper::mapToDto)
                 .toList();
 
