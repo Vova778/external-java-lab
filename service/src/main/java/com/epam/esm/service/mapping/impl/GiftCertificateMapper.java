@@ -13,8 +13,9 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class GiftCertificateMappingServiceImpl implements MappingService<GiftCertificate, GiftCertificateDTO> {
+public class GiftCertificateMapper implements MappingService<GiftCertificate, GiftCertificateDTO> {
     private final MappingService<Tag, TagDTO> tagMappingService;
+
     @Override
     public GiftCertificate mapFromDto(GiftCertificateDTO certificateDTO) {
         GiftCertificate model = new GiftCertificate();
@@ -22,18 +23,20 @@ public class GiftCertificateMappingServiceImpl implements MappingService<GiftCer
         if (certificateDTO.getTags() != null && !certificateDTO.getTags().isEmpty()) {
             certificateDTO.getTags().forEach(tagDTO -> model.getTags().add(tagMappingService.mapFromDto(tagDTO)));
         }
-        log.debug("[GiftCertificateMappingService] GiftCertificateDTO converted to GiftCertificate model: [{}]", model);
+        log.debug("[GiftCertificateMappingService] GiftCertificateDTO: [{}] converted to GiftCertificate model: [{}]",
+                certificateDTO, model);
         return model;
     }
 
     @Override
     public GiftCertificateDTO mapToDto(GiftCertificate model) {
         GiftCertificateDTO giftCertificateDTO = new GiftCertificateDTO();
-        BeanUtils.copyProperties(model, giftCertificateDTO);
+        BeanUtils.copyProperties(model, giftCertificateDTO, "tokens");
         if (model.getTags() != null && !model.getTags().isEmpty()) {
-            model.getTags().forEach(tag -> giftCertificateDTO.getTags().add(tagMappingService.mapToDto(tag)));
+            model.getTags().forEach(tagDTO -> giftCertificateDTO.getTags().add(tagMappingService.mapToDto(tagDTO)));
         }
-        log.debug("[GiftCertificateMappingService.mapToDTO()] Model converted to DTO: [{}]", giftCertificateDTO);
+        log.debug("[GiftCertificateMappingService.mapToDTO()] GiftCertificate model: [{}] converted to DTO: [{}]",
+                model, giftCertificateDTO);
         return giftCertificateDTO;
     }
 }

@@ -6,7 +6,7 @@ import com.epam.esm.exception.model.TagAlreadyExistsException;
 import com.epam.esm.exception.model.TagNotFoundException;
 import com.epam.esm.model.entity.Tag;
 import com.epam.esm.service.TagService;
-import com.epam.esm.service.mapping.MappingService;
+import com.epam.esm.service.mapping.impl.TagMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
     private final TagRepository tagRepository;
-    private final MappingService<Tag, TagDTO> mappingService;
+    private final TagMapper tagMapper;
 
     @Override
     public TagDTO save(TagDTO tagDTO) throws TagAlreadyExistsException {
@@ -31,13 +31,13 @@ public class TagServiceImpl implements TagService {
             throw new IllegalArgumentException("An exception occurs: TagDTO can't be null");
         }
 
-        Tag tag = mappingService.mapFromDto(tagDTO);
+        Tag tag = tagMapper.mapFromDto(tagDTO);
         if (tagRepository.existsByName(tag.getName())) {
             log.error("[TagService.save()] Tag with given name:[{}] already exists.", tagDTO.getName());
             throw new TagAlreadyExistsException(String.format("Tag with given name:[%s] already exists.", tagDTO.getName()));
         }
         Tag savedTag = tagRepository.save(tag);
-        return mappingService.mapToDto(savedTag);
+        return tagMapper.mapToDto(savedTag);
     }
 
     @Override
@@ -48,10 +48,10 @@ public class TagServiceImpl implements TagService {
         }
 
         TagDTO tagDTO = tagRepository.findById(id)
-                .map(mappingService::mapToDto)
+                .map(tagMapper::mapToDto)
                 .orElseThrow(() -> {
                     log.error("[TagService.findById()] Tag for given ID:[{}] not found", id);
-                    throw new TagNotFoundException(String.format("Tag not found (id:[%d])", id));
+                    return new TagNotFoundException(String.format("Tag not found (id:[%d])", id));
                 });
 
         log.debug("[TagService.findById()] Tag received from database: [{}], for ID:[{}]", tagDTO, id);
@@ -62,10 +62,10 @@ public class TagServiceImpl implements TagService {
     public TagDTO findByName(String name) {
         Validate.notBlank(name);
         TagDTO tagDTO = tagRepository.findByName(name)
-                .map(mappingService::mapToDto)
+                .map(tagMapper::mapToDto)
                 .orElseThrow(() -> {
                     log.error("[TagService.findByName()] Tag for given name:[{}] not found", name);
-                    throw new TagNotFoundException(String.format("Tag not found (name:[%s])", name));
+                    return new TagNotFoundException(String.format("Tag not found (name:[%s])", name));
                 });
 
         log.debug("[TagService.findByName()] Tag received from database: [{}], for name:[{}]", tagDTO, name);
@@ -82,7 +82,7 @@ public class TagServiceImpl implements TagService {
 
         List<TagDTO> tags = tagRepository.findAllByCertificate(certificateID, pageable)
                 .stream()
-                .map(mappingService::mapToDto)
+                .map(tagMapper::mapToDto)
                 .toList();
         if (tags.isEmpty()) {
             log.error("[TagService.findAllByGiftCertificate()] Tags not found");
@@ -98,10 +98,10 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagDTO findMostWidelyUsedTagOfUserWithHighestCostOfAllOrders() {
         return tagRepository.findMostWidelyUsedTagOfUserWithHighestCostOfAllOrders()
-                .map(mappingService::mapToDto)
+                .map(tagMapper::mapToDto)
                 .orElseThrow(() -> {
                     log.error("[TagService.findMostWidelyUsedTagOfUserWithHighestCostOfAllOrders()] Tag not found");
-                    throw new TagNotFoundException("Tag not found");
+                    return new TagNotFoundException("Tag not found");
                 });
     }
 
@@ -110,14 +110,14 @@ public class TagServiceImpl implements TagService {
     public Page<TagDTO> findAll(Pageable pageable) {
         List<TagDTO> tags = tagRepository.findAll(pageable)
                 .stream()
-                .map(mappingService::mapToDto)
+                .map(tagMapper::mapToDto)
                 .toList();
         if (tags.isEmpty()) {
             log.error("[TagService.findAll()] Tags not found");
             throw new TagNotFoundException("Tags not found");
         }
         log.debug("[TagService.findAll()] Tags received from database: [{}]", tags);
-        Long totalRecords = tagRepository.count();
+        long totalRecords = tagRepository.count();
         return new PageImpl<>(tags, pageable, totalRecords);
     }
 

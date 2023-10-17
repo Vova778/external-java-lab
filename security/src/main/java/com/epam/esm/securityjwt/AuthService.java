@@ -75,9 +75,9 @@ public class AuthService {
 
         return AuthenticationResponse
                 .builder()
-                .userEmail(user.getEmail())
-                .userRole(user.getUserRole().getRoleName())
-                .accessToken(savedToken.getJwt())
+                .email(user.getEmail())
+                .role(user.getUserRole().getRoleName())
+                .token(savedToken.getJwt())
                 .refreshToken(refreshToken)
                 .build();
     }
@@ -105,9 +105,9 @@ public class AuthService {
 
         return AuthenticationResponse
                 .builder()
-                .userEmail(user.getEmail())
-                .userRole(user.getUserRole().getRoleName())
-                .accessToken(token.getJwt())
+                .email(user.getEmail())
+                .role(user.getUserRole().getRoleName())
+                .token(token.getJwt())
                 .refreshToken(refreshToken)
                 .build();
     }
@@ -176,9 +176,9 @@ public class AuthService {
             saveTokenForUser(user, accessToken);
 
             authenticationResponse = AuthenticationResponse.builder()
-                    .userEmail(userEmail)
-                    .userRole(user.getUserRole().getRoleName())
-                    .accessToken(accessToken)
+                    .email(userEmail)
+                    .role(user.getUserRole().getRoleName())
+                    .token(accessToken)
                     .refreshToken(refreshToken)
                     .build();
         }

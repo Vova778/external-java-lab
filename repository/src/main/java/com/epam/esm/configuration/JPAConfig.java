@@ -30,6 +30,7 @@ import java.util.Properties;
 @Slf4j
 @Configuration
 @EnableJpaRepositories("com.epam.esm")
+@ComponentScan("com.epam.esm.utils")
 @EnableTransactionManagement
 @Data
 public class JPAConfig {

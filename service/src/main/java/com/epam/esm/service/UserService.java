@@ -8,6 +8,8 @@ public interface UserService {
     UserDTO save(UserDTO userDTO);
     UserDTO findById(Long id);
 
+    UserDTO findByEmail(String email);
+
     Page<UserDTO> findAll(Pageable pageable);
 
     Page<UserDTO> findAllByName(String name, Pageable pageable);

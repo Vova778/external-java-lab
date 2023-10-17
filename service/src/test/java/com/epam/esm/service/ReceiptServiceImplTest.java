@@ -5,7 +5,7 @@ import com.epam.esm.dto.ReceiptDTO;
 import com.epam.esm.exception.model.ReceiptNotFoundException;
 import com.epam.esm.model.entity.Receipt;
 import com.epam.esm.service.impl.ReceiptServiceImpl;
-import com.epam.esm.service.mapping.impl.ReceiptMappingServiceImpl;
+import com.epam.esm.service.mapping.impl.ReceiptMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,13 +22,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ReceiptServiceImplTest {
+class ReceiptServiceImplTest {
     @Mock
     private ReceiptRepository receiptRepository;
     @InjectMocks
     private ReceiptServiceImpl receiptService;
     @Mock
-    private ReceiptMappingServiceImpl receiptMappingService;
+    private ReceiptMapper receiptMappingService;
 
     @Mock
     private UserService userService;

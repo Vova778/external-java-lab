@@ -10,9 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthenticationResponse {
-
-    private String userEmail;
-    private String userRole;
-    private String accessToken;
+    private String email;
+    private String role;
+    private String token;
     private String refreshToken;
 }

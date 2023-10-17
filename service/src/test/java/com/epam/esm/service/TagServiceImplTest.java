@@ -6,7 +6,7 @@ import com.epam.esm.exception.model.TagAlreadyExistsException;
 import com.epam.esm.exception.model.TagNotFoundException;
 import com.epam.esm.model.entity.Tag;
 import com.epam.esm.service.impl.TagServiceImpl;
-import com.epam.esm.service.mapping.impl.TagMappingServiceImpl;
+import com.epam.esm.service.mapping.impl.TagMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,13 +25,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class TagServiceImplTest {
+class TagServiceImplTest {
     @InjectMocks
     private TagServiceImpl tagService;
     @Mock
     private TagRepository tagRepository;
     @Spy
-    private TagMappingServiceImpl tagMappingService;
+    private TagMapper tagMappingService;
 
     @Test
     void shouldSaveTest(){

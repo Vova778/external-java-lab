@@ -8,8 +8,8 @@ import com.epam.esm.exception.model.GiftCertificateNotFoundException;
 import com.epam.esm.model.entity.GiftCertificate;
 import com.epam.esm.model.entity.Tag;
 import com.epam.esm.service.impl.GiftCertificateServiceImpl;
-import com.epam.esm.service.mapping.impl.GiftCertificateMappingServiceImpl;
-import com.epam.esm.service.mapping.impl.TagMappingServiceImpl;
+import com.epam.esm.service.mapping.impl.GiftCertificateMapper;
+import com.epam.esm.service.mapping.impl.TagMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class GiftCertificateServiceImplTest {
+class GiftCertificateServiceImplTest {
     @Mock
     private GiftCertificateRepository giftCertificateRepository;
     @InjectMocks
@@ -35,10 +35,10 @@ public class GiftCertificateServiceImplTest {
     private TagRepository tagRepository;
 
     @Mock
-    private GiftCertificateMappingServiceImpl certificateMappingService;
+    private GiftCertificateMapper certificateMappingService;
 
     @Mock
-    private TagMappingServiceImpl tagMappingService;
+    private TagMapper tagMappingService;
 
     @Test
     void shouldSaveGiftCertificateTest() {

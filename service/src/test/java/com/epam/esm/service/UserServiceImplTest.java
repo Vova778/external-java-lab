@@ -8,7 +8,7 @@ import com.epam.esm.exception.model.UserNotFoundException;
 import com.epam.esm.model.entity.User;
 import com.epam.esm.model.enums.UserRole;
 import com.epam.esm.service.impl.UserServiceImpl;
-import com.epam.esm.service.mapping.impl.UserMappingServiceImpl;
+import com.epam.esm.service.mapping.impl.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,13 +26,13 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
-public class UserServiceImplTest {
+class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
     @InjectMocks
     private UserServiceImpl userService;
     @Spy
-    private UserMappingServiceImpl userMappingService;
+    private UserMapper userMappingService;
 
     @Test
     void shouldSaveValidUserTest() {
@@ -90,6 +90,25 @@ public class UserServiceImplTest {
         assertNotNull(foundUserDTO);
         assertEquals("Sample", foundUserDTO.getFirstName());
         verify(userRepository).findById(userId);
+    }
+
+    @Test
+    void shouldFindByEmailValidIdTest() {
+        // Given
+        String userEmail = "sample@example.com";
+        User user = createSampleUser();
+
+        when(userRepository.existsByEmail(userEmail)).thenReturn(true);
+        when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(user));
+        when(userMappingService.mapToDto(user)).thenReturn(createSampleUserDTO());
+
+        // When
+        UserDTO foundUserDTO = userService.findByEmail(userEmail);
+
+        // Then
+        assertNotNull(foundUserDTO);
+        assertEquals("Sample", foundUserDTO.getFirstName());
+        verify(userRepository).findByEmail(userEmail);
     }
 
     @Test
