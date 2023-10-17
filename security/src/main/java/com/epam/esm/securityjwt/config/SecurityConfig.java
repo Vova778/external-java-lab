@@ -92,11 +92,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // Додайте адресу вашого фронтенду
-        configuration.setAllowedMethods(List.of("*")); // Додайте необхідні HTTP-методи
-        configuration.setAllowedHeaders(List.of("*")); // Дозвольте всі заголовки
-        configuration.setAllowCredentials(true); // Дозволити передачу креденцій (cookies, авторизація)
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedMethods(List.of("*"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
         configuration.addExposedHeader("Authorization");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
